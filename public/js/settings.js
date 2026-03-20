@@ -88,6 +88,110 @@ const Settings = (() => {
 
     body.appendChild(prefsSection);
 
+    // ── Banner Editor ──
+    const bannerSection = createSection('Banner Message');
+
+    const announcements = DataLayer.getAnnouncements();
+    const activeBanner = announcements.find(a => a.active) || announcements[0] || null;
+    const bannerColor = DataLayer.getBannerColor();
+
+    // Color row
+    const colorRow = document.createElement('div');
+    colorRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const colorLabel = document.createElement('span');
+    colorLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);';
+    colorLabel.textContent = 'Color';
+    colorRow.appendChild(colorLabel);
+
+    const bannerColorInput = document.createElement('input');
+    bannerColorInput.type = 'color';
+    bannerColorInput.value = bannerColor;
+    bannerColorInput.style.cssText = 'width:32px;height:24px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:0;';
+    colorRow.appendChild(bannerColorInput);
+
+    // Preview swatch
+    const swatch = document.createElement('div');
+    swatch.style.cssText = 'flex:1;height:24px;border-radius:4px;background:' + bannerColor + ';';
+    colorRow.appendChild(swatch);
+    bannerColorInput.addEventListener('input', () => {
+      swatch.style.background = bannerColorInput.value;
+    });
+
+    bannerSection.appendChild(colorRow);
+
+    // Message text
+    const msgLabel = document.createElement('span');
+    msgLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;';
+    msgLabel.textContent = 'Message';
+    bannerSection.appendChild(msgLabel);
+
+    const msgInput = document.createElement('input');
+    msgInput.type = 'text';
+    msgInput.value = activeBanner ? activeBanner.text : '';
+    msgInput.placeholder = 'Enter banner message...';
+    msgInput.style.cssText = 'width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;';
+    bannerSection.appendChild(msgInput);
+
+    // Link (optional)
+    const linkLabel = document.createElement('span');
+    linkLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin:8px 0 4px;';
+    linkLabel.textContent = 'Link (optional)';
+    bannerSection.appendChild(linkLabel);
+
+    const linkInput = document.createElement('input');
+    linkInput.type = 'url';
+    linkInput.value = (activeBanner && activeBanner.link) ? activeBanner.link : '';
+    linkInput.placeholder = 'https://...';
+    linkInput.style.cssText = 'width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;';
+    bannerSection.appendChild(linkInput);
+
+    // Active toggle
+    const activeRow = document.createElement('div');
+    activeRow.className = 'settings-toggle';
+    activeRow.style.marginTop = '8px';
+    const activeLabel = document.createElement('span');
+    activeLabel.className = 'settings-toggle__label';
+    activeLabel.textContent = 'Show banner';
+    activeRow.appendChild(activeLabel);
+    const activeToggle = createToggleInput(activeBanner ? activeBanner.active !== false : true, () => {});
+    activeRow.appendChild(activeToggle);
+    bannerSection.appendChild(activeRow);
+
+    // Save button
+    const bannerSaveBtn = document.createElement('button');
+    bannerSaveBtn.className = 'settings-btn';
+    bannerSaveBtn.textContent = 'Update Banner';
+    bannerSaveBtn.style.cssText = 'margin-top:10px;padding:6px 16px;font-weight:600;width:100%;';
+    bannerSaveBtn.addEventListener('click', () => {
+      const text = msgInput.value.trim();
+      const link = linkInput.value.trim() || null;
+      const isActive = activeToggle.querySelector('input').checked;
+
+      // Save banner color
+      DataLayer.saveBannerColor(bannerColorInput.value);
+
+      // Save announcement
+      const updated = [{
+        id: activeBanner ? activeBanner.id : '1',
+        text: text || 'Welcome to the ETS Dashboard!',
+        link: link,
+        active: isActive
+      }];
+      DataLayer.saveAnnouncements(updated);
+
+      // Clear dismissed state so it shows again
+      sessionStorage.removeItem('ets_banner_dismissed');
+
+      if (typeof App !== 'undefined') App.render();
+
+      // Visual feedback
+      bannerSaveBtn.textContent = 'Saved!';
+      setTimeout(() => { bannerSaveBtn.textContent = 'Update Banner'; }, 1200);
+    });
+    bannerSection.appendChild(bannerSaveBtn);
+
+    body.appendChild(bannerSection);
+
     // ── Admin Features ──
     if (isAdmin) {
       // Pod Appearance (color + icon)

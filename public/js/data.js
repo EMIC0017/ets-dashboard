@@ -103,7 +103,34 @@ const DataLayer = (() => {
     saveBulletin(items);
     return items;
   }
-  function getAnnouncements() { return _config?.announcements || []; }
+  var BANNER_KEY = 'ets_banner';
+
+  function getAnnouncements() {
+    // localStorage overrides config
+    try {
+      var stored = localStorage.getItem(BANNER_KEY);
+      if (stored) return JSON.parse(stored);
+    } catch (e) { /* ignore */ }
+    return _config?.announcements || [];
+  }
+
+  function saveAnnouncements(arr) {
+    try { localStorage.setItem(BANNER_KEY, JSON.stringify(arr)); }
+    catch (e) { /* quota */ }
+  }
+
+  function getBannerColor() {
+    try {
+      var c = localStorage.getItem('ets_banner_color');
+      if (c) return c;
+    } catch (e) { /* ignore */ }
+    return (_config?.settings?.bannerColor) || '#EF4444';
+  }
+
+  function saveBannerColor(color) {
+    try { localStorage.setItem('ets_banner_color', color); }
+    catch (e) { /* quota */ }
+  }
   function getOnCall() { return _config?.onCall || null; }
   function getSpotlight() { return _config?.spotlight || null; }
   function getCertifiedApps() {
@@ -330,7 +357,8 @@ const DataLayer = (() => {
   return {
     load, getConfig, getPods, getTeamMembers, getMeetings,
     getBulletin, saveBulletin, addBulletinItem, removeBulletinItem, updateBulletinItem,
-    getAnnouncements, getOnCall, getSpotlight, getCertifiedApps, getStickers,
+    getAnnouncements, saveAnnouncements, getBannerColor, saveBannerColor,
+    getOnCall, getSpotlight, getCertifiedApps, getStickers,
     getAdmins, getSettings,
     saveCertifiedApps, addCertifiedApp, removeCertifiedApp, updateCertifiedApp,
     getTeamRoster, saveTeamRoster, addTeamMember, removeTeamMember, updateTeamMember,

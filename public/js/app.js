@@ -96,10 +96,10 @@ const App = (() => {
     }
 
     // Apply custom banner color
-    const settings = DataLayer.getSettings();
-    if (settings.bannerColor) {
-      banner.style.setProperty('--banner-color', settings.bannerColor);
-      banner.style.background = settings.bannerColor;
+    const bannerColor = DataLayer.getBannerColor();
+    if (bannerColor) {
+      banner.style.setProperty('--banner-color', bannerColor);
+      banner.style.background = bannerColor;
     }
   }
 
