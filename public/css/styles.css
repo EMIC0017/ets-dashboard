@@ -167,27 +167,27 @@ html, body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-/* Pod background icon — posterized centered watermark in pod color */
+/* Pod background icon — posterized single-color centered watermark */
 .pod-card__bg-icon {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 73px;
-  opacity: 0.35;
+  opacity: 0.55;
   pointer-events: none;
   line-height: 1;
   z-index: 0;
-  filter: grayscale(1) brightness(1.2);
   color: var(--pod-color, #666);
   -webkit-text-fill-color: var(--pod-color, #666);
+  filter: saturate(0) brightness(1.4);
 }
 /* For image-based icons — tinted via pod color overlay */
 .pod-card__bg-icon img {
   width: 73px;
   height: 73px;
   object-fit: contain;
-  filter: grayscale(1) brightness(0.4);
+  filter: saturate(0) brightness(0.5);
   mix-blend-mode: multiply;
 }
 .pod-card__header {
