@@ -235,25 +235,70 @@ const Settings = (() => {
         appsTable.appendChild(appsThead);
 
         const appsTbody = document.createElement('tbody');
+        // Helper: make a table cell editable on click
+        function makeEditable(td, value, fieldWidth, onSave) {
+          td.style.cursor = 'pointer';
+          td.title = 'Click to edit';
+          td.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (td.querySelector('input')) return; // already editing
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = value;
+            input.style.cssText = 'width:' + fieldWidth + ';height:24px;border:1px solid var(--border);border-radius:4px;padding:0 4px;font-size:12px;font-family:var(--font);outline:none;';
+            td.textContent = '';
+            td.appendChild(input);
+            input.focus();
+            input.select();
+            const commit = () => {
+              const newVal = input.value.trim();
+              if (newVal && newVal !== value) {
+                onSave(newVal);
+                if (typeof App !== 'undefined') App.render();
+                renderSettingsBody();
+              } else {
+                td.textContent = value;
+              }
+            };
+            input.addEventListener('blur', commit);
+            input.addEventListener('keydown', (ke) => {
+              if (ke.key === 'Enter') commit();
+              if (ke.key === 'Escape') { td.textContent = value; }
+            });
+          });
+        }
+
         apps.forEach(app => {
           const tr = document.createElement('tr');
 
           const tdIcon = document.createElement('td');
           tdIcon.textContent = app.icon;
+          makeEditable(tdIcon, app.icon, '36px', (val) => {
+            app.icon = val;
+            DataLayer.saveCertifiedApps(apps);
+          });
           tr.appendChild(tdIcon);
 
           const tdName = document.createElement('td');
           tdName.textContent = app.name;
           tdName.style.fontWeight = '500';
+          makeEditable(tdName, app.name, '100%', (val) => {
+            app.name = val;
+            DataLayer.saveCertifiedApps(apps);
+          });
           tr.appendChild(tdName);
 
           const tdUrl = document.createElement('td');
-          const urlLink = document.createElement('a');
-          urlLink.href = app.url;
-          urlLink.target = '_blank';
-          urlLink.textContent = new URL(app.url).hostname;
-          urlLink.style.cssText = 'color:#3B82F6;text-decoration:none;font-size:11px;';
-          tdUrl.appendChild(urlLink);
+          const urlDisplay = document.createElement('span');
+          try { urlDisplay.textContent = new URL(app.url).hostname; }
+          catch { urlDisplay.textContent = app.url; }
+          urlDisplay.style.cssText = 'color:#3B82F6;font-size:11px;';
+          tdUrl.appendChild(urlDisplay);
+          makeEditable(tdUrl, app.url, '100%', (val) => {
+            try { new URL(val); } catch { return; }
+            app.url = val;
+            DataLayer.saveCertifiedApps(apps);
+          });
           tr.appendChild(tdUrl);
 
           const tdDelete = document.createElement('td');
