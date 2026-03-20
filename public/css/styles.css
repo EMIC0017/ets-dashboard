@@ -995,6 +995,7 @@ html, body {
 }
 .sticker-bubble:hover { box-shadow: var(--shadow-lg); }
 .sticker-bubble:active { cursor: grabbing; }
+.sticker-bubble--mine { border: 1.5px solid rgba(34,197,94,0.45); }
 /* Tooltip removed — owner info now shown in right-click context menu */
 
 /* Thought bubble — varies position around sticker */

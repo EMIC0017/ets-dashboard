@@ -218,7 +218,7 @@ const Stickers = (() => {
 
     stickers.forEach(sticker => {
       const el = document.createElement('div');
-      el.className = 'sticker-bubble';
+      el.className = 'sticker-bubble' + (sticker.placedBy === currentUser ? ' sticker-bubble--mine' : '');
       el.dataset.id = sticker.id;
       el.style.left = (sticker.x * window.innerWidth) + 'px';
       el.style.top = (sticker.y * window.innerHeight) + 'px';
