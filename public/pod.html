@@ -718,6 +718,9 @@
       <input type="text" id="podSettingsBgOpacity" placeholder="15" maxlength="3">
       <label>Meme GIF URL</label>
       <input type="url" id="podSettingsMemeUrl" placeholder="https://media.giphy.com/...">
+      <label>Card Icon (emoji or image URL)</label>
+      <input type="text" id="podSettingsBgIcon" placeholder="📢 or https://...icon.png">
+      <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Overrides the pod card background icon on the main dashboard. Appears as a monochromatic watermark.</div>
       <label>Google Calendar ID</label>
       <input type="text" id="podSettingsCalId" placeholder="team-ads@group.calendar.google.com">
       <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Paste a Google Calendar ID to embed the pod's team schedule. Leave blank for manual entries.</div>
@@ -858,6 +861,7 @@
         document.getElementById('podSettingsBgImage').value = ps.bgImage || '';
         document.getElementById('podSettingsBgOpacity').value = ps.bgOpacity || '15';
         document.getElementById('podSettingsMemeUrl').value = ps.memeUrl || '';
+        document.getElementById('podSettingsBgIcon').value = ps.bgIcon || '';
         document.getElementById('podSettingsCalId').value = ps.calendarId || '';
         settingsOverlay.classList.add('visible');
       });
@@ -876,6 +880,7 @@
         ps.bgImage = document.getElementById('podSettingsBgImage').value.trim();
         ps.bgOpacity = document.getElementById('podSettingsBgOpacity').value.trim() || '15';
         ps.memeUrl = document.getElementById('podSettingsMemeUrl').value.trim();
+        ps.bgIcon = document.getElementById('podSettingsBgIcon').value.trim();
         ps.calendarId = document.getElementById('podSettingsCalId').value.trim();
         DataLayer.savePodSettings(pod.shortName, ps);
         settingsOverlay.classList.remove('visible');

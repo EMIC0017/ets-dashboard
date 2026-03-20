@@ -167,16 +167,26 @@ html, body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-/* Pod background icon */
+/* Pod background icon — monochromatic watermark */
 .pod-card__bg-icon {
   position: absolute;
   bottom: 4px;
   right: 6px;
   font-size: 56px;
-  opacity: 0.07;
+  opacity: 0.2;
   pointer-events: none;
   line-height: 1;
   z-index: 0;
+  filter: grayscale(1);
+  mix-blend-mode: multiply;
+}
+/* For image-based icons */
+.pod-card__bg-icon img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  opacity: 0.2;
+  filter: grayscale(1);
 }
 .pod-card__header {
   display: flex;
@@ -551,6 +561,14 @@ html, body {
   background: transparent;
   filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
 }
+.spotlight-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
 .spotlight {
   display: flex;
   align-items: center;
@@ -754,6 +772,11 @@ html, body {
   padding: 6px 4px 2px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 2px;
+}
+.member-pod-divider--mgmt {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--text-primary) !important;
+  font-size: 10px;
 }
 
 /* ── Bottom Strip: Certified Apps ── */

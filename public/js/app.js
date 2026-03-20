@@ -139,11 +139,23 @@ const App = (() => {
         window.location.href = 'pod.html?id=' + pod.id;
       });
 
-      // Background icon (very transparent)
-      if (pod.icon) {
+      // Background icon — use pod settings override or default emoji
+      const podSettings = DataLayer.getPodSettings ? DataLayer.getPodSettings(pod.shortName) : {};
+      const customIcon = podSettings.bgIcon || pod.icon;
+      if (customIcon) {
         const bgIcon = document.createElement('div');
         bgIcon.className = 'pod-card__bg-icon';
-        bgIcon.textContent = pod.icon;
+        // If it looks like a URL, render as tinted image; otherwise as emoji text
+        if (customIcon.startsWith('http') || customIcon.startsWith('/') || customIcon.startsWith('data:')) {
+          const img = document.createElement('img');
+          img.src = customIcon;
+          img.alt = '';
+          bgIcon.appendChild(img);
+        } else {
+          bgIcon.textContent = customIcon;
+        }
+        // Apply monochromatic pod-color tint
+        bgIcon.style.color = color;
         card.appendChild(bgIcon);
       }
 
@@ -568,22 +580,25 @@ const App = (() => {
       podColorMap[p.shortName] = customColors[p.shortName] || p.color;
     });
 
-    // Sort based on preference (default: pod)
+    // Separate management from pod members
+    const mgmt = members.filter(m => m.pod === 'Management');
+    const podMembers = members.filter(m => m.pod !== 'Management');
+
+    // Sort pod members based on preference (default: pod)
     const sortMode = Settings.getPrefs().teamSortMode || 'pod';
     const podOrder = pods.map(p => p.shortName);
-    const sorted = [...members].sort((a, b) => {
+    const sorted = [...podMembers].sort((a, b) => {
       if (sortMode === 'pod') {
         const podDiff = podOrder.indexOf(a.pod) - podOrder.indexOf(b.pod);
         if (podDiff !== 0) return podDiff;
         return a.name.localeCompare(b.name);
       }
-      // alphabetical
       return a.name.localeCompare(b.name);
     });
 
     list.textContent = '';
 
-    if (sorted.length === 0) {
+    if (mgmt.length === 0 && sorted.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
       empty.style.gridColumn = '1 / -1';
@@ -592,9 +607,21 @@ const App = (() => {
       return;
     }
 
+    // ── Render Management tier first ──
+    if (mgmt.length > 0) {
+      const divider = document.createElement('div');
+      divider.className = 'member-pod-divider member-pod-divider--mgmt';
+      divider.textContent = 'Management';
+      list.appendChild(divider);
+
+      mgmt.forEach(m => {
+        list.appendChild(buildMemberRow(m, null));
+      });
+    }
+
+    // ── Render pod members ──
     let lastPod = null;
     sorted.forEach(m => {
-      // Pod group divider
       if (sortMode === 'pod' && m.pod !== lastPod) {
         const divider = document.createElement('div');
         divider.className = 'member-pod-divider';
@@ -605,6 +632,12 @@ const App = (() => {
         lastPod = m.pod;
       }
 
+      list.appendChild(buildMemberRow(m, podColorMap));
+    });
+  }
+
+  // ── Build a single member row ──
+  function buildMemberRow(m, podColorMap) {
       const row = document.createElement('div');
       row.className = 'member-row';
 
@@ -614,11 +647,11 @@ const App = (() => {
 
       const name = document.createElement('span');
       name.className = 'member-name';
-      // Leader gets black text, everyone else gets pod color
-      if (m.role === 'leader') {
+      // Managers get black text, everyone else gets pod color
+      if (m.pod === 'Management') {
         name.classList.add('member-name--leader');
       } else {
-        name.style.color = podColorMap[m.pod] || 'var(--text-primary)';
+        name.style.color = (podColorMap && podColorMap[m.pod]) || 'var(--text-primary)';
       }
       name.textContent = m.name;
       row.appendChild(name);
@@ -642,8 +675,7 @@ const App = (() => {
         row.addEventListener('mouseleave', hideMemberTooltip);
       }
 
-      list.appendChild(row);
-    });
+      return row;
   }
 
   // ── Member Tooltip ──
