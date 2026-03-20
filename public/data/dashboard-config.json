@@ -11,7 +11,7 @@
     {
       "id": "1",
       "title": "🎉 ETS Dashboard Launch!",
-      "body": "The new ETS Dashboard is live! This is your one-stop shop for team updates, pod stats, and more. Feedback welcome in #ets-general.",
+      "body": "The new ETS Dashboard is live! This is your one-stop shop for team updates, pod stats, and more. Feedback welcome in #team-ets-only.",
       "createdAt": "2026-03-20T10:00:00Z",
       "highlight": "#DBEAFE",
       "textColor": "#1E40AF"
@@ -60,20 +60,20 @@
   "spotlight": {
     "type": "teamMember",
     "title": "Team Member of the Week",
-    "name": "Sarah Chen",
-    "pod": "Cat",
-    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=SarahChen",
-    "message": "For outstanding work on the catalog migration — shipping ahead of schedule with zero regressions!"
+    "name": "Niraj Patel",
+    "pod": "Ads",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=NirajPatel",
+    "message": "For shipping the first Claude skill (ets-pso-resolution) to the Instacart marketplace — automating PSO ticket resolutions!"
   },
   "pods": [
     {
       "id": "ads",
       "shortName": "Ads",
-      "fullName": "Ads",
+      "fullName": "Ads / Emerging",
       "icon": "📢",
       "color": "#3B82F6",
       "stats": {
-        "teamSize": 8,
+        "teamSize": 3,
         "weeklyIncoming": [32, 38, 45, 42, 36, 50, 42],
         "weeklyThroughput": [28, 35, 40, 39, 33, 46, 38],
         "weeklyAHT": [4.2, 3.8, 4.5, 3.9, 4.1, 3.6, 3.8],
@@ -91,7 +91,7 @@
       "icon": "📚",
       "color": "#22C55E",
       "stats": {
-        "teamSize": 10,
+        "teamSize": 9,
         "weeklyIncoming": [48, 52, 61, 55, 58, 63, 56],
         "weeklyThroughput": [45, 49, 57, 52, 55, 60, 51],
         "weeklyAHT": [3.1, 2.9, 3.4, 3.0, 2.8, 3.2, 2.7],
@@ -109,7 +109,7 @@
       "icon": "🛒",
       "color": "#F97316",
       "stats": {
-        "teamSize": 6,
+        "teamSize": 11,
         "weeklyIncoming": [25, 28, 34, 30, 27, 35, 31],
         "weeklyThroughput": [22, 25, 30, 28, 24, 32, 28],
         "weeklyAHT": [5.1, 4.8, 5.5, 5.0, 4.6, 5.2, 4.9],
@@ -123,7 +123,7 @@
     {
       "id": "faas",
       "shortName": "FaaS",
-      "fullName": "FaaS",
+      "fullName": "Fulfillment",
       "icon": "☁️",
       "color": "#8B5CF6",
       "stats": {
@@ -145,7 +145,7 @@
       "icon": "🍽️",
       "color": "#EF4444",
       "stats": {
-        "teamSize": 6,
+        "teamSize": 5,
         "weeklyIncoming": [30, 33, 40, 36, 32, 38, 35],
         "weeklyThroughput": [27, 30, 36, 33, 29, 35, 30],
         "weeklyAHT": [4.8, 4.5, 5.0, 4.3, 4.7, 4.2, 4.4],
@@ -176,51 +176,56 @@
     }
   ],
   "teamMembers": [
-    { "id": "1", "name": "Eric Morin", "pod": "Ads", "role": "leader", "status": "online", "statusMessage": "Building the dashboard", "statusEmoji": "🚀" },
-    { "id": "2", "name": "Sarah Chen", "pod": "Cat", "status": "online", "statusMessage": "Reviewing PRs", "statusEmoji": "👀" },
-    { "id": "3", "name": "Mike Johnson", "pod": "Caper", "status": "away", "statusMessage": "In a meeting", "statusEmoji": "📞" },
-    { "id": "4", "name": "Lisa Park", "pod": "FaaS", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "5", "name": "James Wilson", "pod": "FS", "status": "offline", "statusMessage": "OOO until Monday", "statusEmoji": "🏖️" },
-    { "id": "6", "name": "Amy Torres", "pod": "WL", "status": "online", "statusMessage": "Sprint planning", "statusEmoji": "📋" },
-    { "id": "7", "name": "David Kim", "pod": "Ads", "status": "away", "statusMessage": "Lunch break", "statusEmoji": "🍔" },
-    { "id": "8", "name": "Rachel Green", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "9", "name": "Tom Bradley", "pod": "Caper", "status": "online", "statusMessage": "Deep focus", "statusEmoji": "🎯" },
-    { "id": "10", "name": "Nina Patel", "pod": "FaaS", "status": "offline", "statusMessage": "", "statusEmoji": "" },
-    { "id": "11", "name": "Chris Evans", "pod": "FS", "status": "online", "statusMessage": "Shipping features", "statusEmoji": "🚢" },
-    { "id": "12", "name": "Maria Santos", "pod": "WL", "status": "away", "statusMessage": "Coffee run", "statusEmoji": "☕" },
-    { "id": "13", "name": "Alex Rivera", "pod": "Ads", "status": "online", "statusMessage": "Code review", "statusEmoji": "🔍" },
-    { "id": "14", "name": "Ben Foster", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "15", "name": "Carla Diaz", "pod": "Caper", "status": "away", "statusMessage": "Standup", "statusEmoji": "🧍" },
-    { "id": "16", "name": "Dan Murphy", "pod": "FaaS", "status": "online", "statusMessage": "Debugging", "statusEmoji": "🐛" },
-    { "id": "17", "name": "Elena Voss", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "18", "name": "Frank Liu", "pod": "WL", "status": "offline", "statusMessage": "PTO", "statusEmoji": "🌴" },
-    { "id": "19", "name": "Grace Kim", "pod": "Ads", "status": "online", "statusMessage": "Pair programming", "statusEmoji": "👥" },
-    { "id": "20", "name": "Henry Zhang", "pod": "Cat", "status": "away", "statusMessage": "1:1 meeting", "statusEmoji": "💬" },
-    { "id": "21", "name": "Iris Nakamura", "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "22", "name": "Jake Olsen", "pod": "FaaS", "status": "online", "statusMessage": "Testing", "statusEmoji": "🧪" },
-    { "id": "23", "name": "Karen Walsh", "pod": "FS", "status": "offline", "statusMessage": "Sick day", "statusEmoji": "🤒" },
-    { "id": "24", "name": "Leo Fernandez", "pod": "WL", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "25", "name": "Mia Thompson", "pod": "Ads", "status": "online", "statusMessage": "Writing docs", "statusEmoji": "📝" },
-    { "id": "26", "name": "Nate Cooper", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "27", "name": "Olivia Hayes", "pod": "Caper", "status": "away", "statusMessage": "Lunch", "statusEmoji": "🥗" },
-    { "id": "28", "name": "Paul Singh", "pod": "FaaS", "status": "online", "statusMessage": "Deploying", "statusEmoji": "🚀" },
-    { "id": "29", "name": "Quinn Reeves", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "30", "name": "Rosa Martinez", "pod": "WL", "status": "online", "statusMessage": "Sprint retro", "statusEmoji": "🔄" },
-    { "id": "31", "name": "Sam Brooks", "pod": "Ads", "status": "away", "statusMessage": "Doctor appt", "statusEmoji": "🏥" },
-    { "id": "32", "name": "Tina Wu", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "33", "name": "Umar Sheikh", "pod": "Caper", "status": "online", "statusMessage": "On a call", "statusEmoji": "📱" },
-    { "id": "34", "name": "Vera Popov", "pod": "FaaS", "status": "offline", "statusMessage": "Vacation", "statusEmoji": "✈️" },
-    { "id": "35", "name": "Will Chen", "pod": "FS", "status": "online", "statusMessage": "Heads down", "statusEmoji": "🎧" },
-    { "id": "36", "name": "Xena Hart", "pod": "WL", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "37", "name": "Yuki Tanaka", "pod": "Ads", "status": "online", "statusMessage": "Design review", "statusEmoji": "🎨" },
-    { "id": "38", "name": "Zoe Adams", "pod": "Cat", "status": "away", "statusMessage": "BRB", "statusEmoji": "⏳" },
-    { "id": "39", "name": "Aaron Blake", "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "40", "name": "Bella Russo", "pod": "FaaS", "status": "online", "statusMessage": "Monitoring", "statusEmoji": "📊" },
-    { "id": "41", "name": "Carl Jensen", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "42", "name": "Diana Lee", "pod": "WL", "status": "away", "statusMessage": "Picking up kids", "statusEmoji": "🚗" },
-    { "id": "43", "name": "Ethan Price", "pod": "Ads", "status": "online", "statusMessage": "Backlog grooming", "statusEmoji": "📋" },
-    { "id": "44", "name": "Fiona Grant", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
-    { "id": "45", "name": "George Malik", "pod": "Caper", "status": "online", "statusMessage": "Writing tests", "statusEmoji": "✅" }
+    { "id": "1",  "name": "Eric Morin",           "pod": "Ads",   "role": "leader",  "status": "online", "statusMessage": "Building the dashboard", "statusEmoji": "🚀" },
+    { "id": "2",  "name": "Alicia Horton",         "pod": "Cat",   "role": "manager", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "3",  "name": "Jonathan Bloomfield",   "pod": "FaaS",  "role": "manager", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "4",  "name": "Sudhanshu Chugh",       "pod": "WL",    "role": "manager", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "5",  "name": "Hassan Javaid",         "pod": "Caper", "role": "lead",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "6",  "name": "Nikita Patrachari",     "pod": "Cat",   "role": "pm",      "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "10", "name": "Harshjot Gahunia",      "pod": "Ads",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "11", "name": "Niraj Patel",           "pod": "Ads",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "20", "name": "Nathan Abraham",        "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "21", "name": "Hayden Kim",            "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "22", "name": "Maryna Kostiuk",        "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "23", "name": "Ali Zaidi",             "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "24", "name": "Arpreet Arora",         "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "25", "name": "Avneet Taneja",         "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "26", "name": "Cecilia Tse",           "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "27", "name": "Omaid Nadi",            "pod": "Cat",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "30", "name": "Patrick Tan",           "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "31", "name": "Gabriel Sliwowicz",     "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "32", "name": "Alicia Webber",         "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "33", "name": "Aneeq Nasir",           "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "34", "name": "Abdullah Mohammed",     "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "35", "name": "Jack Lowry",            "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "36", "name": "Tommy Otis",            "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "37", "name": "Kishore Bobba",         "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "38", "name": "Sahil Khan",            "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "39", "name": "Shafeeq Zaman",         "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "40", "name": "Chandan Kaushal",       "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "41", "name": "Titus Andersen",        "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "42", "name": "Maximus Cresswell",     "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "43", "name": "Salman Ijaz",           "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "44", "name": "John Aba",              "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "45", "name": "Graham McGregor",       "pod": "FaaS",  "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "50", "name": "Shravan Kumar",         "pod": "FS",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "51", "name": "Nandini Patel",         "pod": "FS",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "52", "name": "Jaivin James",          "pod": "FS",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "53", "name": "Gage Maher",            "pod": "FS",    "role": "senior",   "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "54", "name": "Harsh Mehta",           "pod": "FS",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+
+    { "id": "60", "name": "Artem Korottchenko",    "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "61", "name": "Bilal Rizvi",           "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "62", "name": "Chris Jin",             "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "63", "name": "Sahil Saluja",          "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "64", "name": "Madhuri Surve",         "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "65", "name": "Sofia Salgado",         "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "66", "name": "Yaseen Lambe",          "pod": "WL",    "status": "online", "statusMessage": "", "statusEmoji": "" }
   ],
   "meetings": [
     {
@@ -253,7 +258,11 @@
     "link": "https://go/ets-oncall",
     "inIncident": false,
     "incidentNote": "",
-    "opsgenieCalUrl": "webcal://instacart.app.opsgenie.com/webapi/webcal/getRecentSchedule?webcalToken=7556950f844ed9d3ab41de34bb70240322070f7669e9d2a0f98fb03b1f9bbe25&scheduleId=0bdcc631-f582-4a80-b87b-30e3f0a215b0"
+    "opsgenieCalUrl": "webcal://instacart.app.opsgenie.com/webapi/webcal/getRecentSchedule?webcalToken=7556950f844ed9d3ab41de34bb70240322070f7669e9d2a0f98fb03b1f9bbe25&scheduleId=0bdcc631-f582-4a80-b87b-30e3f0a215b0",
+    "afterHours": {
+      "name": "",
+      "calendarUrl": ""
+    }
   },
   "certifiedApps": [
     { "id": "1", "name": "Champ", "url": "https://dash.champ.ai/app", "icon": "🏆" },
@@ -262,7 +271,7 @@
     { "id": "4", "name": "Status Page", "url": "https://enterprise-status.instacart.com/", "icon": "🟢" }
   ],
   "stickers": [],
-  "admins": ["Eric Morin"],
+  "admins": ["Eric Morin", "Alicia Horton", "Jonathan Bloomfield", "Sudhanshu Chugh"],
   "settings": {
     "bannerColor": "#EF4444",
     "podColors": {
@@ -274,6 +283,14 @@
       "WL": "#14B8A6"
     },
     "slackChannelId": "C02QBM042KC",
-    "slackChannelName": "Team ETS"
+    "slackChannelName": "Team ETS",
+    "podChannels": {
+      "Ads": "C073V4FR1DE",
+      "Cat": "",
+      "Caper": "C05L86U993N",
+      "FaaS": "C060VQ316KT",
+      "FS": "C077P6VE9EE",
+      "WL": "C073676HT5H"
+    }
   }
 }
