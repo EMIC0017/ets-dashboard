@@ -224,13 +224,9 @@ const Stickers = (() => {
       el.style.top = (sticker.y * window.innerHeight) + 'px';
       el.textContent = sticker.icon;
 
-      // Thought-bubble tooltip
-      const tooltip = document.createElement('div');
-      tooltip.className = 'sticker-bubble__tooltip';
-      const timeAgo = formatTimeAgo(sticker.placedAt);
+      // Thought bubble (if text exists)
       const customText = sticker.tooltipText || '';
       if (customText) {
-        // Assign a random position if none exists yet
         if (sticker.thoughtPos === undefined || sticker.thoughtPos === null) {
           sticker.thoughtPos = Math.floor(Math.random() * 8);
           _saveStickerField(sticker.id, 'thoughtPos', sticker.thoughtPos);
@@ -240,8 +236,6 @@ const Stickers = (() => {
         thought.textContent = customText;
         el.appendChild(thought);
       }
-      tooltip.textContent = sticker.icon + ' by ' + sticker.placedBy + ' \u00B7 ' + timeAgo;
-      el.appendChild(tooltip);
 
       // Right-click context menu
       el.addEventListener('contextmenu', (e) => {
@@ -301,70 +295,88 @@ const Stickers = (() => {
     menu.style.left = mx + 'px';
     menu.style.top = my + 'px';
 
-    // Inline thought bubble editor
-    const editRow = document.createElement('div');
-    editRow.className = 'sticker-ctx-menu__thought-row';
+    // Owner header — always shown
+    const timeAgo = formatTimeAgo(sticker.placedAt);
+    const ownerRow = document.createElement('div');
+    ownerRow.className = 'sticker-ctx-menu__owner';
+    ownerRow.textContent = sticker.icon + ' by ' + sticker.placedBy;
+    menu.appendChild(ownerRow);
 
-    const thoughtLabel = document.createElement('div');
-    thoughtLabel.className = 'sticker-ctx-menu__label';
-    thoughtLabel.textContent = 'Thought bubble';
-    editRow.appendChild(thoughtLabel);
+    const timeRow = document.createElement('div');
+    timeRow.className = 'sticker-ctx-menu__time';
+    timeRow.textContent = timeAgo;
+    menu.appendChild(timeRow);
 
-    const inputWrap = document.createElement('div');
-    inputWrap.className = 'sticker-ctx-menu__input-wrap';
+    const isOwner = sticker.placedBy === currentUser;
 
-    const thoughtInput = document.createElement('input');
-    thoughtInput.type = 'text';
-    thoughtInput.className = 'sticker-ctx-menu__input';
-    thoughtInput.value = sticker.tooltipText || '';
-    thoughtInput.placeholder = 'Say something...';
-    thoughtInput.maxLength = 15;
-    inputWrap.appendChild(thoughtInput);
+    // ── Owner / Admin view: editable ──
+    if (isOwner || isAdmin) {
+      const divider1 = document.createElement('div');
+      divider1.className = 'sticker-ctx-menu__divider';
+      menu.appendChild(divider1);
 
-    const charCount = document.createElement('span');
-    charCount.className = 'sticker-ctx-menu__charcount';
-    charCount.textContent = (sticker.tooltipText || '').length + '/15';
-    inputWrap.appendChild(charCount);
+      // Inline thought bubble editor
+      const editRow = document.createElement('div');
+      editRow.className = 'sticker-ctx-menu__thought-row';
 
-    editRow.appendChild(inputWrap);
-    menu.appendChild(editRow);
+      const thoughtLabel = document.createElement('div');
+      thoughtLabel.className = 'sticker-ctx-menu__label';
+      thoughtLabel.textContent = 'Thought bubble';
+      editRow.appendChild(thoughtLabel);
 
-    // Update char count live
-    thoughtInput.addEventListener('input', () => {
-      charCount.textContent = thoughtInput.value.length + '/15';
-    });
+      const inputWrap = document.createElement('div');
+      inputWrap.className = 'sticker-ctx-menu__input-wrap';
 
-    // Save on Enter or blur
-    const saveThought = () => {
-      const newText = thoughtInput.value.trim().slice(0, 15);
-      if (newText !== (sticker.tooltipText || '')) {
-        sticker.tooltipText = newText;
-        const all = DataLayer.loadStickers();
-        const target = all.find(s => s.id === sticker.id);
-        if (target) {
-          target.tooltipText = newText;
-          DataLayer.saveStickers(all);
+      const thoughtInput = document.createElement('input');
+      thoughtInput.type = 'text';
+      thoughtInput.className = 'sticker-ctx-menu__input';
+      thoughtInput.value = sticker.tooltipText || '';
+      thoughtInput.placeholder = 'Say something...';
+      thoughtInput.maxLength = 15;
+      inputWrap.appendChild(thoughtInput);
+
+      const charCount = document.createElement('span');
+      charCount.className = 'sticker-ctx-menu__charcount';
+      charCount.textContent = (sticker.tooltipText || '').length + '/15';
+      inputWrap.appendChild(charCount);
+
+      editRow.appendChild(inputWrap);
+      menu.appendChild(editRow);
+
+      thoughtInput.addEventListener('input', () => {
+        charCount.textContent = thoughtInput.value.length + '/15';
+      });
+
+      const saveThought = () => {
+        const newText = thoughtInput.value.trim().slice(0, 15);
+        if (newText !== (sticker.tooltipText || '')) {
+          sticker.tooltipText = newText;
+          const all = DataLayer.loadStickers();
+          const target = all.find(s => s.id === sticker.id);
+          if (target) {
+            target.tooltipText = newText;
+            DataLayer.saveStickers(all);
+          }
+          renderStickers();
         }
-        renderStickers();
-      }
-    };
+      };
 
-    thoughtInput.addEventListener('keydown', (ke) => {
-      ke.stopPropagation();
-      if (ke.key === 'Enter') { saveThought(); _dismissCtxMenu(); }
-      if (ke.key === 'Escape') { _dismissCtxMenu(); }
-    });
+      thoughtInput.addEventListener('keydown', (ke) => {
+        ke.stopPropagation();
+        if (ke.key === 'Enter') { saveThought(); _dismissCtxMenu(); }
+        if (ke.key === 'Escape') { _dismissCtxMenu(); }
+      });
 
-    // Save when menu closes (on blur handled by dismiss)
-    menu._saveThought = saveThought;
+      menu._saveThought = saveThought;
 
-    // Divider
-    const divider = document.createElement('div');
-    divider.className = 'sticker-ctx-menu__divider';
-    menu.appendChild(divider);
+      // Auto-focus input
+      menu._focusInput = thoughtInput;
 
-    // Remove sticker (owner or admin only)
-    if (sticker.placedBy === currentUser || isAdmin) {
+      // Divider before remove
+      const divider2 = document.createElement('div');
+      divider2.className = 'sticker-ctx-menu__divider';
+      menu.appendChild(divider2);
+
       const removeItem = document.createElement('div');
       removeItem.className = 'sticker-ctx-menu__item sticker-ctx-menu__item--danger';
       removeItem.textContent = 'Remove sticker';
@@ -375,12 +387,17 @@ const Stickers = (() => {
       });
       menu.appendChild(removeItem);
     }
+    // ── Non-owner view: read-only ──
+    // (owner header already shown above — nothing else needed for now;
+    //  future auth will add "React" or other non-owner actions here)
 
     document.body.appendChild(menu);
     _ctxMenu = menu;
 
-    // Auto-focus the input
-    setTimeout(() => { thoughtInput.focus(); thoughtInput.select(); }, 50);
+    // Auto-focus the input if owner
+    if (menu._focusInput) {
+      setTimeout(() => { menu._focusInput.focus(); menu._focusInput.select(); }, 50);
+    }
 
     // Dismiss on click outside menu
     setTimeout(() => {

@@ -995,22 +995,7 @@ html, body {
 }
 .sticker-bubble:hover { box-shadow: var(--shadow-lg); }
 .sticker-bubble:active { cursor: grabbing; }
-.sticker-bubble__tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--text-primary);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast);
-}
-.sticker-bubble:hover .sticker-bubble__tooltip { opacity: 1; }
+/* Tooltip removed — owner info now shown in right-click context menu */
 
 /* Thought bubble — varies position around sticker */
 .sticker-bubble__thought {
@@ -1095,6 +1080,17 @@ html, body {
 }
 .sticker-ctx-menu__item--danger:hover {
   background: #FEF2F2;
+}
+.sticker-ctx-menu__owner {
+  padding: 8px 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.sticker-ctx-menu__time {
+  padding: 0 12px 4px;
+  font-size: 10px;
+  color: #94A3B8;
 }
 .sticker-ctx-menu__thought-row {
   padding: 8px 12px;
