@@ -224,23 +224,26 @@ const Stickers = (() => {
       el.style.top = (sticker.y * window.innerHeight) + 'px';
       el.textContent = sticker.icon;
 
-      // Tooltip
+      // Thought-bubble tooltip
       const tooltip = document.createElement('div');
       tooltip.className = 'sticker-bubble__tooltip';
       const timeAgo = formatTimeAgo(sticker.placedAt);
+      const customText = sticker.tooltipText || '';
+      if (customText) {
+        // Show thought bubble with custom text
+        const thought = document.createElement('div');
+        thought.className = 'sticker-bubble__thought';
+        thought.textContent = customText;
+        el.appendChild(thought);
+      }
       tooltip.textContent = sticker.icon + ' by ' + sticker.placedBy + ' \u00B7 ' + timeAgo;
       el.appendChild(tooltip);
 
-      // Context menu for removal (owner or admin)
-      if (sticker.placedBy === currentUser || isAdmin) {
-        el.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          if (confirm('Remove this ' + sticker.icon + ' sticker?')) {
-            DataLayer.removeSticker(sticker.id);
-            renderStickers();
-          }
-        });
-      }
+      // Right-click context menu
+      el.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        _showStickerContextMenu(e.clientX, e.clientY, sticker, currentUser, isAdmin);
+      });
 
       // Drag behavior
       el.addEventListener('mousedown', (e) => {
@@ -276,6 +279,67 @@ const Stickers = (() => {
     DataLayer.updateStickerPosition(_dragState.id, nx, ny);
     _dragState = null;
   });
+
+  // ── Sticker Context Menu ──
+
+  let _ctxMenu = null;
+
+  function _showStickerContextMenu(mx, my, sticker, currentUser, isAdmin) {
+    _dismissCtxMenu();
+    const menu = document.createElement('div');
+    menu.className = 'sticker-ctx-menu';
+    menu.style.left = mx + 'px';
+    menu.style.top = my + 'px';
+
+    // Add / edit thought bubble text
+    const editItem = document.createElement('div');
+    editItem.className = 'sticker-ctx-menu__item';
+    editItem.textContent = sticker.tooltipText ? 'Edit thought bubble' : 'Add thought bubble';
+    editItem.addEventListener('click', () => {
+      _dismissCtxMenu();
+      const text = prompt('Enter thought bubble text (max 15 chars):', sticker.tooltipText || '');
+      if (text !== null) {
+        sticker.tooltipText = text.trim().slice(0, 15);
+        // Save to DataLayer
+        const all = DataLayer.loadStickers();
+        const target = all.find(s => s.id === sticker.id);
+        if (target) {
+          target.tooltipText = sticker.tooltipText;
+          DataLayer.saveStickers(all);
+        }
+        renderStickers();
+      }
+    });
+    menu.appendChild(editItem);
+
+    // Remove sticker (owner or admin only)
+    if (sticker.placedBy === currentUser || isAdmin) {
+      const removeItem = document.createElement('div');
+      removeItem.className = 'sticker-ctx-menu__item sticker-ctx-menu__item--danger';
+      removeItem.textContent = 'Remove sticker';
+      removeItem.addEventListener('click', () => {
+        _dismissCtxMenu();
+        DataLayer.removeSticker(sticker.id);
+        renderStickers();
+      });
+      menu.appendChild(removeItem);
+    }
+
+    document.body.appendChild(menu);
+    _ctxMenu = menu;
+
+    // Dismiss on click elsewhere
+    setTimeout(() => {
+      document.addEventListener('click', _dismissCtxMenu, { once: true });
+    }, 0);
+  }
+
+  function _dismissCtxMenu() {
+    if (_ctxMenu) {
+      _ctxMenu.remove();
+      _ctxMenu = null;
+    }
+  }
 
   // ── Helpers ──
 

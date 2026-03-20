@@ -167,26 +167,28 @@ html, body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
-/* Pod background icon — monochromatic watermark */
+/* Pod background icon — posterized centered watermark in pod color */
 .pod-card__bg-icon {
   position: absolute;
-  bottom: 4px;
-  right: 6px;
-  font-size: 56px;
-  opacity: 0.2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 73px;
+  opacity: 0.35;
   pointer-events: none;
   line-height: 1;
   z-index: 0;
-  filter: grayscale(1);
-  mix-blend-mode: multiply;
+  filter: grayscale(1) brightness(1.2);
+  color: var(--pod-color, #666);
+  -webkit-text-fill-color: var(--pod-color, #666);
 }
-/* For image-based icons */
+/* For image-based icons — tinted via pod color overlay */
 .pod-card__bg-icon img {
-  width: 56px;
-  height: 56px;
+  width: 73px;
+  height: 73px;
   object-fit: contain;
-  opacity: 0.2;
-  filter: grayscale(1);
+  filter: grayscale(1) brightness(0.4);
+  mix-blend-mode: multiply;
 }
 .pod-card__header {
   display: flex;
@@ -720,6 +722,7 @@ html, body {
 }
 .member-dot--online { background: #22C55E; }
 .member-dot--away { background: #F59E0B; }
+.member-dot--dnd { background: #EF4444; }
 .member-dot--offline { background: #CBD5E1; }
 .member-name {
   font-size: 11px;
@@ -983,6 +986,80 @@ html, body {
   transition: opacity var(--transition-fast);
 }
 .sticker-bubble:hover .sticker-bubble__tooltip { opacity: 1; }
+
+/* Thought bubble — cloud shape above sticker */
+.sticker-bubble__thought {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 51;
+}
+.sticker-bubble__thought::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 1.5px solid #D1D5DB;
+  border-top: none;
+  border-left: none;
+  border-radius: 0 0 50% 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+.sticker-bubble__thought::before {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: calc(50% + 6px);
+  width: 5px;
+  height: 5px;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 50%;
+}
+
+/* Sticker context menu */
+.sticker-ctx-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 300;
+  min-width: 160px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.sticker-ctx-menu__item {
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.sticker-ctx-menu__item:hover {
+  background: #F3F4F6;
+}
+.sticker-ctx-menu__item--danger {
+  color: #EF4444;
+}
+.sticker-ctx-menu__item--danger:hover {
+  background: #FEF2F2;
+}
 
 @keyframes stickerBounce {
   0% { transform: scale(0); }

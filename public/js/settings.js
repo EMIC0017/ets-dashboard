@@ -366,6 +366,47 @@ const Settings = (() => {
       appsSection.appendChild(addForm);
       body.appendChild(appsSection);
 
+      // Slack Integration (admin)
+      const slackSection = createSection('Slack Integration');
+      const slackBadge = document.createElement('span');
+      slackBadge.className = 'admin-badge';
+      slackBadge.textContent = 'ADMIN';
+      slackSection.querySelector('.settings-section__title').appendChild(slackBadge);
+
+      const slackDesc = document.createElement('div');
+      slackDesc.style.cssText = 'font-size:11px;color:var(--text-muted);margin-bottom:8px;';
+      slackDesc.textContent = 'Enter the URL of a presence proxy to enable live Slack status indicators. The proxy should accept ?users=U1,U2 and return { "U1": "active", "U2": "away" }.';
+      slackSection.appendChild(slackDesc);
+
+      const slackRow = document.createElement('div');
+      slackRow.style.cssText = 'display:flex;gap:6px;align-items:center;';
+      const slackInput = document.createElement('input');
+      slackInput.type = 'url';
+      slackInput.placeholder = 'https://your-proxy.example.com/slack-presence';
+      slackInput.value = (typeof SlackStatus !== 'undefined') ? SlackStatus.getProxyUrl() : '';
+      slackInput.style.cssText = 'flex:1;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:12px;font-family:var(--font);outline:none;';
+      slackRow.appendChild(slackInput);
+
+      const slackSaveBtn = document.createElement('button');
+      slackSaveBtn.className = 'settings-btn';
+      slackSaveBtn.textContent = 'Save';
+      slackSaveBtn.style.cssText = 'padding:4px 12px;height:32px;font-weight:600;';
+      slackSaveBtn.addEventListener('click', () => {
+        if (typeof SlackStatus !== 'undefined') {
+          SlackStatus.configure(slackInput.value.trim());
+          SlackStatus.refresh();
+        }
+      });
+      slackRow.appendChild(slackSaveBtn);
+      slackSection.appendChild(slackRow);
+
+      const slackNote = document.createElement('div');
+      slackNote.style.cssText = 'font-size:10px;color:#94A3B8;margin-top:6px;';
+      slackNote.textContent = 'Without a proxy, status dots show config defaults. The proxy polls every 2 minutes.';
+      slackSection.appendChild(slackNote);
+
+      body.appendChild(slackSection);
+
       // Admin List
       const adminSection = createSection('Admin List');
       const adminListBadge = document.createElement('span');

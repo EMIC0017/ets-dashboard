@@ -21,6 +21,11 @@ const App = (() => {
     render();
     applyVisibility();
 
+    // Start Slack presence polling (uses proxy when configured)
+    if (typeof SlackStatus !== 'undefined') {
+      SlackStatus.startPolling();
+    }
+
     // Auto-refresh
     setInterval(async () => {
       await DataLayer.load();
@@ -664,16 +669,14 @@ const App = (() => {
         row.appendChild(emoji);
       }
 
-      // Hover tooltip with full status
-      if (m.statusEmoji || m.statusMessage) {
-        row.addEventListener('mouseenter', (e) => {
-          showMemberTooltip(e.clientX, e.clientY, m);
-        });
-        row.addEventListener('mousemove', (e) => {
-          moveMemberTooltip(e.clientX, e.clientY);
-        });
-        row.addEventListener('mouseleave', hideMemberTooltip);
-      }
+      // Hover tooltip with title & status
+      row.addEventListener('mouseenter', (e) => {
+        showMemberTooltip(e.clientX, e.clientY, m);
+      });
+      row.addEventListener('mousemove', (e) => {
+        moveMemberTooltip(e.clientX, e.clientY);
+      });
+      row.addEventListener('mouseleave', hideMemberTooltip);
 
       return row;
   }
@@ -699,6 +702,13 @@ const App = (() => {
     nameDiv.className = 'member-tooltip__name';
     nameDiv.textContent = member.name + ' \u00B7 ' + member.pod;
     tip.appendChild(nameDiv);
+
+    if (member.title) {
+      const titleDiv = document.createElement('div');
+      titleDiv.style.cssText = 'font-size:10px;color:var(--text-muted);margin-bottom:2px;';
+      titleDiv.textContent = member.title;
+      tip.appendChild(titleDiv);
+    }
 
     if (member.statusEmoji || member.statusMessage) {
       const statusDiv = document.createElement('div');
