@@ -1175,24 +1175,98 @@ html, body {
 .toggle-switch input:checked + .toggle-switch__slider { background: #3B82F6; }
 .toggle-switch input:checked + .toggle-switch__slider::before { left: 21px; }
 
-/* Color picker */
+/* Pod appearance row: label + icon button + color picker */
 .color-picker-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   padding: 6px 0;
 }
 .color-picker-row__label {
   font-size: 13px;
   color: var(--text-primary);
+  flex: 1;
+}
+.pod-icon-picker-btn {
+  width: 32px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition-fast);
+}
+.pod-icon-picker-btn:hover {
+  border-color: #3B82F6;
 }
 .color-picker-row input[type="color"] {
   width: 32px;
-  height: 24px;
+  height: 28px;
   border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;
   padding: 0;
+}
+
+/* Mini emoji picker dropdown */
+.mini-emoji-picker {
+  position: fixed;
+  width: 240px;
+  max-height: 280px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  z-index: 400;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mini-emoji-picker__search {
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: var(--font);
+  outline: none;
+  box-sizing: border-box;
+}
+.mini-emoji-picker__search:focus {
+  border-color: #3B82F6;
+}
+.mini-emoji-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+.mini-emoji-picker__item {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+.mini-emoji-picker__item:hover {
+  background: #F3F4F6;
+}
+.mini-emoji-picker__item--active {
+  background: #DBEAFE;
+  border-radius: 4px;
 }
 
 /* Sticker management table */

@@ -90,8 +90,8 @@ const Settings = (() => {
 
     // ── Admin Features ──
     if (isAdmin) {
-      // Pod Colors
-      const colorSection = createSection('Pod Colors');
+      // Pod Appearance (color + icon)
+      const colorSection = createSection('Pod Appearance');
       const adminBadge = document.createElement('span');
       adminBadge.className = 'admin-badge';
       adminBadge.textContent = 'ADMIN';
@@ -110,11 +110,25 @@ const Settings = (() => {
         label.textContent = pod.shortName;
         row.appendChild(label);
 
+        // Icon picker button
+        const podSettings = DataLayer.getPodSettings ? DataLayer.getPodSettings(pod.shortName) : {};
+        const currentIcon = podSettings.bgIcon || pod.icon || '';
+
+        const iconBtn = document.createElement('button');
+        iconBtn.className = 'pod-icon-picker-btn';
+        iconBtn.textContent = currentIcon;
+        iconBtn.title = 'Click to change card icon';
+        iconBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          _openMiniEmojiPicker(iconBtn, pod.shortName, currentIcon);
+        });
+        row.appendChild(iconBtn);
+
+        // Color picker
         const input = document.createElement('input');
         input.type = 'color';
         input.value = podColors[pod.shortName] || pod.color;
         input.addEventListener('change', () => {
-          // v1: save to localStorage; future: save to Superblocks
           const customColors = getPrefs().customPodColors || {};
           customColors[pod.shortName] = input.value;
           savePref('customPodColors', customColors);
@@ -125,6 +139,87 @@ const Settings = (() => {
         colorSection.appendChild(row);
       });
       body.appendChild(colorSection);
+
+      // ── Mini Emoji Picker for Pod Icons ──
+      let _miniPicker = null;
+
+      function _openMiniEmojiPicker(anchorBtn, podName, currentIcon) {
+        // Close existing
+        if (_miniPicker) { _miniPicker.remove(); _miniPicker = null; }
+
+        const picker = document.createElement('div');
+        picker.className = 'mini-emoji-picker';
+
+        // Position below the button
+        const rect = anchorBtn.getBoundingClientRect();
+        picker.style.top = (rect.bottom + 4) + 'px';
+        picker.style.left = rect.left + 'px';
+
+        // Search input
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.className = 'mini-emoji-picker__search';
+        searchInput.placeholder = 'Search icons...';
+        picker.appendChild(searchInput);
+
+        // Results grid
+        const grid = document.createElement('div');
+        grid.className = 'mini-emoji-picker__grid';
+        picker.appendChild(grid);
+
+        // Render emojis
+        function renderResults(query) {
+          grid.textContent = '';
+          const results = query
+            ? EmojiData.search(query).slice(0, 40)
+            : EmojiData.getAll().slice(0, 40);
+          results.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'mini-emoji-picker__item';
+            btn.textContent = item.emoji;
+            btn.title = item.name || '';
+            if (item.emoji === currentIcon) btn.classList.add('mini-emoji-picker__item--active');
+            btn.addEventListener('click', () => {
+              // Save to pod settings
+              const ps = DataLayer.getPodSettings ? DataLayer.getPodSettings(podName) : {};
+              ps.bgIcon = item.emoji;
+              if (DataLayer.savePodSettings) DataLayer.savePodSettings(podName, ps);
+              anchorBtn.textContent = item.emoji;
+              if (_miniPicker) { _miniPicker.remove(); _miniPicker = null; }
+              if (typeof App !== 'undefined') App.render();
+            });
+            grid.appendChild(btn);
+          });
+          if (results.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:11px;padding:8px;';
+            empty.textContent = 'No matches';
+            grid.appendChild(empty);
+          }
+        }
+
+        renderResults('');
+
+        let _debounce = null;
+        searchInput.addEventListener('input', () => {
+          clearTimeout(_debounce);
+          _debounce = setTimeout(() => renderResults(searchInput.value.trim()), 150);
+        });
+
+        document.body.appendChild(picker);
+        _miniPicker = picker;
+        searchInput.focus();
+
+        // Close on click outside
+        setTimeout(() => {
+          document.addEventListener('click', function closer(e) {
+            if (picker.contains(e.target) || e.target === anchorBtn) return;
+            picker.remove();
+            _miniPicker = null;
+            document.removeEventListener('click', closer);
+          });
+        }, 0);
+      }
 
       // Sticker Management
       const stickerSection = createSection('Sticker Management');
