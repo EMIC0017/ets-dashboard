@@ -1,0 +1,279 @@
+{
+  "announcements": [
+    {
+      "id": "1",
+      "text": "Welcome to the new ETS Dashboard! Explore your pod, check out team stats, and drop a sticker.",
+      "link": null,
+      "active": true
+    }
+  ],
+  "bulletin": [
+    {
+      "id": "1",
+      "title": "🎉 ETS Dashboard Launch!",
+      "body": "The new ETS Dashboard is live! This is your one-stop shop for team updates, pod stats, and more. Feedback welcome in #ets-general.",
+      "createdAt": "2026-03-20T10:00:00Z",
+      "highlight": "#DBEAFE",
+      "textColor": "#1E40AF"
+    },
+    {
+      "id": "2",
+      "title": "📅 ETS All-Hands — March 21 at 10:00 AM",
+      "body": "Join the quarterly all-hands this Saturday. Agenda: Q1 review, Q2 priorities, team recognition.",
+      "createdAt": "2026-03-20T09:00:00Z",
+      "highlight": "#FEF3C7",
+      "textColor": "#92400E"
+    },
+    {
+      "id": "3",
+      "title": "⏰ Q1 Wrap-Up Reminder",
+      "body": "Please submit your Q1 accomplishments by end of day Friday.",
+      "createdAt": "2026-03-19T15:00:00Z",
+      "highlight": null,
+      "textColor": null
+    },
+    {
+      "id": "4",
+      "title": "🚀 Caper Carts v3.2 Shipped",
+      "body": "Congrats to the Caper team on shipping the new checkout flow! 14% improvement in conversion.",
+      "createdAt": "2026-03-18T12:00:00Z",
+      "highlight": "#FFF7ED",
+      "textColor": "#9A3412"
+    },
+    {
+      "id": "5",
+      "title": "📊 Weekly Metrics Published",
+      "body": "The latest ETS weekly metrics are now available in the shared spreadsheet.",
+      "createdAt": "2026-03-17T16:00:00Z",
+      "highlight": null,
+      "textColor": null
+    },
+    {
+      "id": "6",
+      "title": "🔧 Maintenance Window — March 23",
+      "body": "Scheduled maintenance on staging environments Sunday 2-4 AM PST. Production unaffected.",
+      "createdAt": "2026-03-16T10:00:00Z",
+      "highlight": "#FEE2E2",
+      "textColor": "#991B1B"
+    }
+  ],
+  "spotlight": {
+    "type": "teamMember",
+    "title": "Team Member of the Week",
+    "name": "Sarah Chen",
+    "pod": "Cat",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=SarahChen",
+    "message": "For outstanding work on the catalog migration — shipping ahead of schedule with zero regressions!"
+  },
+  "pods": [
+    {
+      "id": "ads",
+      "shortName": "Ads",
+      "fullName": "Ads",
+      "icon": "📢",
+      "color": "#3B82F6",
+      "stats": {
+        "teamSize": 8,
+        "weeklyIncoming": [32, 38, 45, 42, 36, 50, 42],
+        "weeklyThroughput": [28, 35, 40, 39, 33, 46, 38],
+        "weeklyAHT": [4.2, 3.8, 4.5, 3.9, 4.1, 3.6, 3.8],
+        "responseSLA": 94,
+        "resolutionSLA": 87,
+        "totalBreaches": 3,
+        "totalEscalations": 1,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    },
+    {
+      "id": "cat",
+      "shortName": "Cat",
+      "fullName": "Catalog",
+      "icon": "📚",
+      "color": "#22C55E",
+      "stats": {
+        "teamSize": 10,
+        "weeklyIncoming": [48, 52, 61, 55, 58, 63, 56],
+        "weeklyThroughput": [45, 49, 57, 52, 55, 60, 51],
+        "weeklyAHT": [3.1, 2.9, 3.4, 3.0, 2.8, 3.2, 2.7],
+        "responseSLA": 97,
+        "resolutionSLA": 92,
+        "totalBreaches": 0,
+        "totalEscalations": 0,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    },
+    {
+      "id": "caper",
+      "shortName": "Caper",
+      "fullName": "Caper Carts",
+      "icon": "🛒",
+      "color": "#F97316",
+      "stats": {
+        "teamSize": 6,
+        "weeklyIncoming": [25, 28, 34, 30, 27, 35, 31],
+        "weeklyThroughput": [22, 25, 30, 28, 24, 32, 28],
+        "weeklyAHT": [5.1, 4.8, 5.5, 5.0, 4.6, 5.2, 4.9],
+        "responseSLA": 91,
+        "resolutionSLA": 84,
+        "totalBreaches": 5,
+        "totalEscalations": 2,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    },
+    {
+      "id": "faas",
+      "shortName": "FaaS",
+      "fullName": "FaaS",
+      "icon": "☁️",
+      "color": "#8B5CF6",
+      "stats": {
+        "teamSize": 7,
+        "weeklyIncoming": [22, 25, 30, 28, 24, 32, 27],
+        "weeklyThroughput": [19, 22, 26, 25, 21, 28, 25],
+        "weeklyAHT": [6.0, 5.5, 6.2, 5.8, 5.3, 5.9, 5.6],
+        "responseSLA": 89,
+        "resolutionSLA": 81,
+        "totalBreaches": 7,
+        "totalEscalations": 3,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    },
+    {
+      "id": "fs",
+      "shortName": "FS",
+      "fullName": "Foodstorm",
+      "icon": "🍽️",
+      "color": "#EF4444",
+      "stats": {
+        "teamSize": 6,
+        "weeklyIncoming": [30, 33, 40, 36, 32, 38, 35],
+        "weeklyThroughput": [27, 30, 36, 33, 29, 35, 30],
+        "weeklyAHT": [4.8, 4.5, 5.0, 4.3, 4.7, 4.2, 4.4],
+        "responseSLA": 93,
+        "resolutionSLA": 86,
+        "totalBreaches": 2,
+        "totalEscalations": 1,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    },
+    {
+      "id": "wl",
+      "shortName": "WL",
+      "fullName": "White Label",
+      "icon": "🏷️",
+      "color": "#14B8A6",
+      "stats": {
+        "teamSize": 8,
+        "weeklyIncoming": [40, 44, 52, 47, 43, 50, 48],
+        "weeklyThroughput": [37, 41, 48, 44, 40, 47, 44],
+        "weeklyAHT": [3.5, 3.2, 3.8, 3.4, 3.1, 3.6, 3.3],
+        "responseSLA": 96,
+        "resolutionSLA": 90,
+        "totalBreaches": 1,
+        "totalEscalations": 0,
+        "weeks": ["Feb 7", "Feb 14", "Feb 21", "Feb 28", "Mar 7", "Mar 14", "Mar 20"]
+      }
+    }
+  ],
+  "teamMembers": [
+    { "id": "1", "name": "Eric Morin", "pod": "Ads", "role": "leader", "status": "online", "statusMessage": "Building the dashboard", "statusEmoji": "🚀" },
+    { "id": "2", "name": "Sarah Chen", "pod": "Cat", "status": "online", "statusMessage": "Reviewing PRs", "statusEmoji": "👀" },
+    { "id": "3", "name": "Mike Johnson", "pod": "Caper", "status": "away", "statusMessage": "In a meeting", "statusEmoji": "📞" },
+    { "id": "4", "name": "Lisa Park", "pod": "FaaS", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "5", "name": "James Wilson", "pod": "FS", "status": "offline", "statusMessage": "OOO until Monday", "statusEmoji": "🏖️" },
+    { "id": "6", "name": "Amy Torres", "pod": "WL", "status": "online", "statusMessage": "Sprint planning", "statusEmoji": "📋" },
+    { "id": "7", "name": "David Kim", "pod": "Ads", "status": "away", "statusMessage": "Lunch break", "statusEmoji": "🍔" },
+    { "id": "8", "name": "Rachel Green", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "9", "name": "Tom Bradley", "pod": "Caper", "status": "online", "statusMessage": "Deep focus", "statusEmoji": "🎯" },
+    { "id": "10", "name": "Nina Patel", "pod": "FaaS", "status": "offline", "statusMessage": "", "statusEmoji": "" },
+    { "id": "11", "name": "Chris Evans", "pod": "FS", "status": "online", "statusMessage": "Shipping features", "statusEmoji": "🚢" },
+    { "id": "12", "name": "Maria Santos", "pod": "WL", "status": "away", "statusMessage": "Coffee run", "statusEmoji": "☕" },
+    { "id": "13", "name": "Alex Rivera", "pod": "Ads", "status": "online", "statusMessage": "Code review", "statusEmoji": "🔍" },
+    { "id": "14", "name": "Ben Foster", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "15", "name": "Carla Diaz", "pod": "Caper", "status": "away", "statusMessage": "Standup", "statusEmoji": "🧍" },
+    { "id": "16", "name": "Dan Murphy", "pod": "FaaS", "status": "online", "statusMessage": "Debugging", "statusEmoji": "🐛" },
+    { "id": "17", "name": "Elena Voss", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "18", "name": "Frank Liu", "pod": "WL", "status": "offline", "statusMessage": "PTO", "statusEmoji": "🌴" },
+    { "id": "19", "name": "Grace Kim", "pod": "Ads", "status": "online", "statusMessage": "Pair programming", "statusEmoji": "👥" },
+    { "id": "20", "name": "Henry Zhang", "pod": "Cat", "status": "away", "statusMessage": "1:1 meeting", "statusEmoji": "💬" },
+    { "id": "21", "name": "Iris Nakamura", "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "22", "name": "Jake Olsen", "pod": "FaaS", "status": "online", "statusMessage": "Testing", "statusEmoji": "🧪" },
+    { "id": "23", "name": "Karen Walsh", "pod": "FS", "status": "offline", "statusMessage": "Sick day", "statusEmoji": "🤒" },
+    { "id": "24", "name": "Leo Fernandez", "pod": "WL", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "25", "name": "Mia Thompson", "pod": "Ads", "status": "online", "statusMessage": "Writing docs", "statusEmoji": "📝" },
+    { "id": "26", "name": "Nate Cooper", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "27", "name": "Olivia Hayes", "pod": "Caper", "status": "away", "statusMessage": "Lunch", "statusEmoji": "🥗" },
+    { "id": "28", "name": "Paul Singh", "pod": "FaaS", "status": "online", "statusMessage": "Deploying", "statusEmoji": "🚀" },
+    { "id": "29", "name": "Quinn Reeves", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "30", "name": "Rosa Martinez", "pod": "WL", "status": "online", "statusMessage": "Sprint retro", "statusEmoji": "🔄" },
+    { "id": "31", "name": "Sam Brooks", "pod": "Ads", "status": "away", "statusMessage": "Doctor appt", "statusEmoji": "🏥" },
+    { "id": "32", "name": "Tina Wu", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "33", "name": "Umar Sheikh", "pod": "Caper", "status": "online", "statusMessage": "On a call", "statusEmoji": "📱" },
+    { "id": "34", "name": "Vera Popov", "pod": "FaaS", "status": "offline", "statusMessage": "Vacation", "statusEmoji": "✈️" },
+    { "id": "35", "name": "Will Chen", "pod": "FS", "status": "online", "statusMessage": "Heads down", "statusEmoji": "🎧" },
+    { "id": "36", "name": "Xena Hart", "pod": "WL", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "37", "name": "Yuki Tanaka", "pod": "Ads", "status": "online", "statusMessage": "Design review", "statusEmoji": "🎨" },
+    { "id": "38", "name": "Zoe Adams", "pod": "Cat", "status": "away", "statusMessage": "BRB", "statusEmoji": "⏳" },
+    { "id": "39", "name": "Aaron Blake", "pod": "Caper", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "40", "name": "Bella Russo", "pod": "FaaS", "status": "online", "statusMessage": "Monitoring", "statusEmoji": "📊" },
+    { "id": "41", "name": "Carl Jensen", "pod": "FS", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "42", "name": "Diana Lee", "pod": "WL", "status": "away", "statusMessage": "Picking up kids", "statusEmoji": "🚗" },
+    { "id": "43", "name": "Ethan Price", "pod": "Ads", "status": "online", "statusMessage": "Backlog grooming", "statusEmoji": "📋" },
+    { "id": "44", "name": "Fiona Grant", "pod": "Cat", "status": "online", "statusMessage": "", "statusEmoji": "" },
+    { "id": "45", "name": "George Malik", "pod": "Caper", "status": "online", "statusMessage": "Writing tests", "statusEmoji": "✅" }
+  ],
+  "meetings": [
+    {
+      "id": "1",
+      "title": "ETS All Hands",
+      "start": "2026-03-21T14:00:00Z",
+      "durationMinutes": 60,
+      "meetingLink": "https://meet.google.com/ets-allhands",
+      "attendees": ["All ETS"]
+    },
+    {
+      "id": "2",
+      "title": "Pod Leads Sync",
+      "start": "2026-03-22T16:00:00Z",
+      "durationMinutes": 30,
+      "meetingLink": "https://meet.google.com/pod-leads",
+      "attendees": ["Pod Leads"]
+    },
+    {
+      "id": "3",
+      "title": "Sprint Review",
+      "start": "2026-03-24T18:00:00Z",
+      "durationMinutes": 45,
+      "meetingLink": "https://meet.google.com/sprint-review",
+      "attendees": ["All ETS"]
+    }
+  ],
+  "onCall": {
+    "name": "Eric Morin",
+    "link": "https://go/ets-oncall",
+    "inIncident": false,
+    "incidentNote": "",
+    "opsgenieCalUrl": "webcal://instacart.app.opsgenie.com/webapi/webcal/getRecentSchedule?webcalToken=7556950f844ed9d3ab41de34bb70240322070f7669e9d2a0f98fb03b1f9bbe25&scheduleId=0bdcc631-f582-4a80-b87b-30e3f0a215b0"
+  },
+  "certifiedApps": [
+    { "id": "1", "name": "Champ", "url": "https://dash.champ.ai/app", "icon": "🏆" },
+    { "id": "2", "name": "Jira Board", "url": "https://instacart.atlassian.net/jira/dashboards/17758", "icon": "📋" },
+    { "id": "3", "name": "ETS Metrics", "url": "https://docs.google.com/spreadsheets/d/1dnYtOxEtPEyaok_lg8UGMNaNvqmC9Sum9NY_s02i5gU/edit", "icon": "📊" },
+    { "id": "4", "name": "Status Page", "url": "https://enterprise-status.instacart.com/", "icon": "🟢" }
+  ],
+  "stickers": [],
+  "admins": ["Eric Morin"],
+  "settings": {
+    "bannerColor": "#EF4444",
+    "podColors": {
+      "Ads": "#3B82F6",
+      "Cat": "#22C55E",
+      "Caper": "#F97316",
+      "FaaS": "#8B5CF6",
+      "FS": "#EF4444",
+      "WL": "#14B8A6"
+    },
+    "slackChannelId": "C02QBM042KC",
+    "slackChannelName": "Team ETS"
+  }
+}

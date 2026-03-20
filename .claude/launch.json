@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ETS Dashboard Dev Server",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "public", "-p", "8080", "-c-1", "--cors"],
+      "port": 8080
+    }
+  ]
+}

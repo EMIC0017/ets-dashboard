@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETS Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Name Prompt Modal -->
+  <div class="name-modal hidden" id="nameModal">
+    <div class="name-modal__card">
+      <div class="name-modal__title">Hey there! 👋</div>
+      <div class="name-modal__subtitle">What's your name? This helps us show who's who on the dashboard.</div>
+      <input type="text" class="name-modal__input" id="nameInput" placeholder="Your name..." autofocus>
+      <br>
+      <button class="name-modal__submit" id="nameSubmit">Let's go!</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Shell -->
+  <div class="dashboard" id="dashboard">
+
+    <!-- Announcement Banner -->
+    <div class="banner" id="banner">
+      <span id="bannerText"></span>
+      <button class="banner__dismiss" id="bannerDismiss" title="Dismiss">&times;</button>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header__title">Welcome to ETS</div>
+      <div class="header__subtitle" id="headerSubtitle"></div>
+      <button class="header__settings" id="settingsBtn" title="Settings">⚙</button>
+    </div>
+
+    <!-- Main 3-Column Layout -->
+    <div class="main">
+
+      <!-- Left: Pod Tiles -->
+      <div class="pods-col">
+        <div class="pods-week" id="podsWeek"></div>
+        <div class="pods-grid" id="podsGrid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Center: Bulletin Board (full height) -->
+      <div class="center-col">
+        <div class="section-card" id="bulletinSection" style="flex:1;">
+          <div class="section-card__header">
+            <span>📌 Bulletin Board</span>
+            <button class="bulletin-add-btn" id="bulletinAddBtn" title="New post">+</button>
+          </div>
+          <div class="section-card__body" id="bulletinList">
+            <!-- Rendered by JS -->
+          </div>
+          <div class="section-card__footer" id="spotlightArea">
+            <!-- Tip of the Week / Team Member of the Week -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: On-Call + Team Status -->
+      <div class="right-col">
+        <div class="on-call-bar" id="onCallBar">
+          <!-- Rendered by JS -->
+        </div>
+        <div class="team-status" id="teamStatusSection">
+          <div class="team-status__header">👥 Team Status</div>
+          <div class="team-status__list" id="teamList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom: Certified Apps -->
+    <div class="apps-strip" id="appsStrip">
+      <span class="apps-strip__label">Certified Apps</span>
+      <!-- Rendered by JS -->
+    </div>
+
+  </div>
+
+  <!-- Sticker System -->
+  <button class="sticker-add-btn" id="stickerAddBtn" title="Add a sticker">+</button>
+  <div class="sticker-picker" id="stickerPicker">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-overlay" id="settingsOverlay"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-panel__header">
+      <span class="settings-panel__title">Settings</span>
+      <button class="settings-panel__close" id="settingsClose">&times;</button>
+    </div>
+    <div class="settings-panel__body" id="settingsBody">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Last Updated -->
+  <div class="last-updated">
+    <span class="last-updated__dot"></span>
+    <span id="lastUpdatedTime">Just now</span>
+  </div>
+
+  <!-- Scripts (cache-bust v2) -->
+  <script src="js/data.js?v=4"></script>
+  <script src="js/emoji-data.js?v=4"></script>
+  <script src="js/stickers.js?v=4"></script>
+  <script src="js/settings.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+
+</body>
+</html>

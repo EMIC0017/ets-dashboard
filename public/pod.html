@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ETS Dashboard — Pod</title>
+  <link rel="stylesheet" href="css/styles.css?v=4">
+  <style>
+    /* ── Pod Page Layout ── */
+    body { overflow: hidden; }
+    .dashboard { display: flex; flex-direction: column; height: 100vh; }
+
+    .pod-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px 4px;
+      flex-shrink: 0;
+    }
+    .pod-header__back {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .pod-header__back:hover { box-shadow: var(--shadow-sm); }
+    .pod-header__color-bar {
+      width: 5px;
+      height: 36px;
+      border-radius: 3px;
+    }
+    .pod-header__name {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .pod-header__fullname {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .pod-header__right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pod-header__stat {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .pod-header__stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .pod-header__stat-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+    }
+
+    /* ── 2x2 Quadrant Grid ── */
+    .pod-grid {
+      display: grid;
+      grid-template-columns: 55fr 45fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      padding: 10px 24px;
+      flex: 1;
+      min-height: 0;
+    }
+    .pod-grid__cell {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pod-grid__cell-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .pod-grid__cell-header button {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .pod-grid__cell-header button:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .pod-grid__cell-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
+
+    /* ── Pod Background ── */
+    .pod-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+    .pod-bg--overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ── Meme GIF Area (inside bulletin) ── */
+    .pod-meme {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      max-height: 160px;
+      overflow: hidden;
+      background: var(--bg-secondary);
+      position: relative;
+    }
+    .pod-meme img {
+      max-width: 100%;
+      max-height: 160px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .pod-meme__empty {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 8px;
+    }
+    .pod-meme__hint {
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      font-size: 9px;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .pod-meme:hover .pod-meme__hint { opacity: 1; }
+
+    /* ── Pod Settings Panel ── */
+    .pod-settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 900;
+    }
+    .pod-settings-overlay.visible { display: block; }
+    .pod-settings-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      width: 360px;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 901;
+      box-shadow: var(--shadow-lg);
+    }
+    .pod-settings-panel h3 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .pod-settings-panel label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+    .pod-settings-panel label:first-of-type { margin-top: 0; }
+    .pod-settings-panel input[type="text"],
+    .pod-settings-panel input[type="color"],
+    .pod-settings-panel input[type="url"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    .pod-settings-panel input[type="color"] {
+      height: 36px;
+      padding: 2px;
+      cursor: pointer;
+    }
+    .pod-settings__row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .pod-settings__row > div { flex: 1; }
+    .pod-settings__actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .pod-settings__actions button {
+      padding: 6px 16px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .pod-settings__actions .btn-save {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+    .pod-settings__actions .btn-reset {
+      color: var(--text-muted);
+    }
+
+    /* ── Split Cell (Team + Schedule) ── */
+    .pod-grid__cell--split {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .pod-split__top {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .pod-split__bottom {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+      border-top: 2px solid var(--border);
+    }
+    .pod-split__top .pod-grid__cell-body,
+    .pod-split__bottom .pod-grid__cell-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 12px;
+    }
+
+    /* ── Schedule Items ── */
+    .pod-schedule-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 3px;
+      font-size: 12px;
+    }
+    .pod-schedule-item:hover { background: var(--bg-secondary); }
+    .pod-schedule-item__title { font-weight: 500; flex: 1; }
+    .pod-schedule-item__date {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+    .pod-schedule-item__delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 0 2px;
+      margin-left: 4px;
+      line-height: 1;
+    }
+    .pod-schedule-item__delete:hover { color: var(--red); }
+    .pod-schedule-item--past {
+      opacity: 0.5;
+    }
+    .pod-schedule-item--today {
+      background: #FEF3C7;
+      font-weight: 600;
+    }
+
+    /* ── Pod Bulletin Items ── */
+    .pod-bulletin-item {
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .pod-bulletin-item__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .pod-bulletin-item__title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .pod-bulletin-item__body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .pod-bulletin-item__meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .pod-bulletin-item__delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 0 2px;
+      line-height: 1;
+    }
+    .pod-bulletin-item__delete:hover { color: var(--red); }
+
+    /* ── Pod Add Form (inline) ── */
+    .pod-add-form {
+      display: none;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .pod-add-form.visible { display: block; }
+    .pod-add-form input,
+    .pod-add-form textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 12px;
+      margin-bottom: 6px;
+      box-sizing: border-box;
+    }
+    .pod-add-form textarea { resize: vertical; min-height: 48px; }
+    .pod-add-form__actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .pod-add-form__actions button {
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 11px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .pod-add-form__actions .btn-save {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    /* ── Pod Team List ── */
+    .pod-team-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 8px;
+    }
+    .pod-team-member {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+    }
+    .pod-team-member:hover { background: var(--bg-secondary); }
+    .pod-team-member__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .pod-team-member__dot--online { background: #22C55E; }
+    .pod-team-member__dot--away { background: #F59E0B; }
+    .pod-team-member__dot--offline { background: #9CA3AF; }
+    .pod-team-member__name { font-weight: 500; }
+    .pod-team-member__emoji { font-size: 11px; }
+    .pod-team-member__status-tip {
+      display: none;
+      position: absolute;
+      background: var(--text-primary);
+      color: white;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .pod-team-member:hover .pod-team-member__status-tip {
+      display: block;
+    }
+
+    /* ── Pod Apps (bottom-left) ── */
+    .pod-apps-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .pod-app-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all var(--transition-fast);
+    }
+    .pod-app-badge:hover {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--text-muted);
+    }
+    .pod-app-badge__icon { font-size: 18px; }
+
+    /* ── Pod Metrics (bottom-right) ── */
+    .pod-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 4px 0;
+    }
+    .pod-metric-card {
+      text-align: center;
+      padding: 12px 8px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .pod-metric-card__value {
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .pod-metric-card__label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .pod-metric-card__bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .pod-metric-card__bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+    .pod-metric-card--sla-green .pod-metric-card__value { color: #22C55E; }
+    .pod-metric-card--sla-amber .pod-metric-card__value { color: #F59E0B; }
+    .pod-metric-card--sla-red .pod-metric-card__value { color: #EF4444; }
+    .pod-metric-card--sla-green .pod-metric-card__bar-fill { background: #22C55E; }
+    .pod-metric-card--sla-amber .pod-metric-card__bar-fill { background: #F59E0B; }
+    .pod-metric-card--sla-red .pod-metric-card__bar-fill { background: #EF4444; }
+
+    /* ── Pod App Add Form ── */
+    .pod-app-form {
+      display: none;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .pod-app-form.visible { display: block; }
+    .pod-app-form input {
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 12px;
+      margin-bottom: 4px;
+      box-sizing: border-box;
+    }
+
+    /* ── Sticker elements (reuse main dashboard CSS) ── */
+    .pod-page__settings-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .pod-page__settings-btn:hover { box-shadow: var(--shadow-sm); }
+
+    /* Empty state */
+    .pod-empty {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 20px 0;
+      font-style: italic;
+    }
+
+    /* ── Pod Apps Strip (bottom) ── */
+    .pod-apps-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 24px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .pod-apps-strip__label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pod Background (color + image) -->
+  <div class="pod-bg" id="podBg"></div>
+  <div class="pod-bg--overlay" id="podBgOverlay"></div>
+
+  <div class="dashboard">
+    <!-- Pod Header -->
+    <div class="pod-header">
+      <a href="index.html" class="pod-header__back">&larr; ETS</a>
+      <div class="pod-header__color-bar" id="podColorBar"></div>
+      <div>
+        <div class="pod-header__name" id="podName">Loading...</div>
+        <div class="pod-header__fullname" id="podFullName"></div>
+      </div>
+      <div class="pod-header__right">
+        <div class="pod-header__stat">
+          <div class="pod-header__stat-value" id="statTeamSize">—</div>
+          <div>Team</div>
+        </div>
+        <div class="pod-header__stat-divider"></div>
+        <div class="pod-header__stat">
+          <div class="pod-header__stat-value" id="statIncoming">—</div>
+          <div>Incoming</div>
+        </div>
+        <div class="pod-header__stat-divider"></div>
+        <div class="pod-header__stat">
+          <div class="pod-header__stat-value" id="statThroughput">—</div>
+          <div>Throughput</div>
+        </div>
+        <div class="pod-header__stat-divider"></div>
+        <div class="pod-header__stat">
+          <div class="pod-header__stat-value" id="statAHT">—</div>
+          <div>AHT</div>
+        </div>
+        <div class="pod-header__stat-divider"></div>
+        <button class="pod-page__settings-btn" id="podSettingsBtn" title="Pod Settings">⚙</button>
+      </div>
+    </div>
+
+    <!-- 2x2 Quadrant Grid -->
+    <div class="pod-grid">
+      <!-- Top-Left: Pod Bulletin -->
+      <div class="pod-grid__cell">
+        <div class="pod-grid__cell-header">
+          <span>📌 Pod Bulletin</span>
+          <button id="podBulletinAddBtn" title="Add item">+</button>
+        </div>
+        <div class="pod-add-form" id="podBulletinForm">
+          <input type="text" id="podBulletinTitle" placeholder="Title (e.g. 🚀 New Feature Shipped)">
+          <textarea id="podBulletinBody" placeholder="Details..."></textarea>
+          <div class="pod-add-form__actions">
+            <button id="podBulletinCancel">Cancel</button>
+            <button id="podBulletinSave" class="btn-save">Post</button>
+          </div>
+        </div>
+        <div class="pod-grid__cell-body" id="podBulletinList"></div>
+        <!-- Meme GIF area (bottom quarter of bulletin) -->
+        <div class="pod-meme" id="podMeme">
+          <div class="pod-meme__empty">Right-click to set a meme GIF</div>
+          <span class="pod-meme__hint">right-click to change</span>
+        </div>
+      </div>
+
+      <!-- Top-Right: Pod Team + Schedule (split vertically) -->
+      <div class="pod-grid__cell pod-grid__cell--split">
+        <!-- Upper: Team List -->
+        <div class="pod-split__top">
+          <div class="pod-grid__cell-header">
+            <span>👥 Pod Team</span>
+            <span id="podTeamCount" style="font-weight: 400; font-size: 11px;"></span>
+          </div>
+          <div class="pod-grid__cell-body" id="podTeamList"></div>
+        </div>
+        <!-- Lower: Team Schedule -->
+        <div class="pod-split__bottom">
+          <div class="pod-grid__cell-header">
+            <span id="podScheduleTitle">📅 Team Schedule</span>
+            <button id="podScheduleAddBtn" title="Add event">+</button>
+          </div>
+          <div class="pod-add-form" id="podScheduleForm">
+            <input type="text" id="podScheduleTitle" placeholder="Event (e.g. 🏖️ PTO — Sarah)">
+            <input type="date" id="podScheduleDate">
+            <div class="pod-add-form__actions">
+              <button id="podScheduleCancel">Cancel</button>
+              <button id="podScheduleSave" class="btn-save">Add</button>
+            </div>
+          </div>
+          <div class="pod-grid__cell-body" id="podScheduleList"></div>
+        </div>
+      </div>
+
+      <!-- Bottom-Left: Pod Metrics -->
+      <div class="pod-grid__cell">
+        <div class="pod-grid__cell-header">
+          <span>📊 Pod Metrics</span>
+          <span style="font-weight: 400; font-size: 10px; color: var(--text-muted);">This Week</span>
+        </div>
+        <div class="pod-grid__cell-body" id="podMetrics"></div>
+      </div>
+
+      <!-- Bottom-Right: Pod Apps & Links -->
+      <div class="pod-grid__cell">
+        <div class="pod-grid__cell-header">
+          <span>🔗 Pod Apps & Links</span>
+          <button id="podAppAddBtn" title="Add app">+</button>
+        </div>
+        <div class="pod-add-form" id="podAppForm">
+          <input type="text" id="podAppIcon" placeholder="Icon emoji (e.g. 📊)" maxlength="4">
+          <input type="text" id="podAppName" placeholder="App name">
+          <input type="text" id="podAppUrl" placeholder="URL (https://...)">
+          <div class="pod-add-form__actions">
+            <button id="podAppCancel">Cancel</button>
+            <button id="podAppSave" class="btn-save">Add</button>
+          </div>
+        </div>
+        <div class="pod-grid__cell-body" id="podAppsList"></div>
+      </div>
+    </div>
+
+    <!-- Bottom: Certified Apps (shared from main dashboard) -->
+    <div class="pod-apps-strip" id="appsStrip">
+      <span class="pod-apps-strip__label">ETS Apps</span>
+    </div>
+  </div>
+
+  <!-- Pod Settings Panel -->
+  <div class="pod-settings-overlay" id="podSettingsOverlay">
+    <div class="pod-settings-panel" id="podSettingsPanel">
+      <h3>⚙ Pod Settings</h3>
+      <label>Background Color</label>
+      <input type="color" id="podSettingsBgColor" value="#ffffff">
+      <label>Background Image URL</label>
+      <input type="url" id="podSettingsBgImage" placeholder="https://example.com/image.jpg">
+      <label>Background Opacity (0-100%)</label>
+      <input type="text" id="podSettingsBgOpacity" placeholder="15" maxlength="3">
+      <label>Meme GIF URL</label>
+      <input type="url" id="podSettingsMemeUrl" placeholder="https://media.giphy.com/...">
+      <label>Google Calendar ID</label>
+      <input type="text" id="podSettingsCalId" placeholder="team-ads@group.calendar.google.com">
+      <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Paste a Google Calendar ID to embed the pod's team schedule. Leave blank for manual entries.</div>
+      <div class="pod-settings__actions">
+        <button class="btn-reset" id="podSettingsReset">Reset</button>
+        <button id="podSettingsCancel">Cancel</button>
+        <button class="btn-save" id="podSettingsSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticker System (reuses main dashboard structure) -->
+  <div class="sticker-controls">
+    <button class="sticker-add-btn" id="stickerAddBtn">+</button>
+    <div class="sticker-picker" id="stickerPicker"></div>
+  </div>
+
+  <!-- Last Updated -->
+  <div class="last-updated">
+    <span class="last-updated__dot"></span>
+    <span id="lastUpdatedTime">Just now</span>
+  </div>
+
+  <script src="js/data.js?v=4"></script>
+  <script src="js/emoji-data.js?v=4"></script>
+  <script src="js/stickers.js?v=4"></script>
+  <script>
+    // ── Pod Sub-Page Logic ──
+    (async function() {
+      const params = new URLSearchParams(window.location.search);
+      const podId = params.get('id');
+
+      await DataLayer.load();
+
+      const pod = DataLayer.getPods().find(p => p.id === podId);
+      if (!pod) {
+        document.getElementById('podName').textContent = 'Pod not found';
+        return;
+      }
+
+      const podColor = DataLayer.getSettings()?.podColors?.[pod.shortName] || '#6B7280';
+      const members = () => DataLayer.getTeamMembers().filter(m => m.pod === pod.shortName);
+
+      // ── Header ──
+      document.title = 'ETS Dashboard \u2014 ' + pod.shortName;
+      document.getElementById('podName').textContent = pod.shortName;
+      document.getElementById('podFullName').textContent = pod.fullName;
+      document.getElementById('podColorBar').style.background = podColor;
+
+      // Header stats (data nested under pod.stats)
+      const stats = pod.stats || {};
+      const wk = stats.weeklyIncoming || [];
+      const lastIncoming = wk.length ? wk[wk.length - 1] : '\u2014';
+      const wkT = stats.weeklyThroughput || [];
+      const lastThroughput = wkT.length ? wkT[wkT.length - 1] : '\u2014';
+      const wkA = stats.weeklyAHT || [];
+      const lastAHT = wkA.length ? wkA[wkA.length - 1] : '\u2014';
+
+      document.getElementById('statTeamSize').textContent = members().length;
+      document.getElementById('statIncoming').textContent = lastIncoming;
+      document.getElementById('statThroughput').textContent = lastThroughput;
+      document.getElementById('statAHT').textContent = lastAHT + (typeof lastAHT === 'number' ? 'm' : '');
+
+      // ── Stickers (pod-scoped) ──
+      DataLayer.setStickerScope(pod.shortName);
+      Stickers.init();
+
+      // ── Pod Background & Meme ──
+      function applyPodBackground() {
+        const ps = DataLayer.getPodSettings(pod.shortName);
+        const bgEl = document.getElementById('podBg');
+        const overlay = document.getElementById('podBgOverlay');
+        const opacity = parseInt(ps.bgOpacity || '15', 10) / 100;
+
+        if (ps.bgImage) {
+          bgEl.style.backgroundImage = 'url(' + ps.bgImage + ')';
+          bgEl.style.opacity = opacity;
+          bgEl.style.backgroundColor = '';
+        } else if (ps.bgColor && ps.bgColor !== '#ffffff') {
+          bgEl.style.backgroundImage = '';
+          bgEl.style.backgroundColor = ps.bgColor;
+          bgEl.style.opacity = opacity;
+        } else {
+          bgEl.style.backgroundImage = '';
+          bgEl.style.backgroundColor = '';
+          bgEl.style.opacity = '';
+        }
+      }
+
+      function renderMeme() {
+        const meme = document.getElementById('podMeme');
+        const ps = DataLayer.getPodSettings(pod.shortName);
+        meme.textContent = '';
+
+        if (ps.memeUrl) {
+          const img = document.createElement('img');
+          img.src = ps.memeUrl;
+          img.alt = 'Pod meme';
+          img.onerror = function() {
+            this.style.display = 'none';
+            const err = document.createElement('div');
+            err.className = 'pod-meme__empty';
+            err.textContent = 'Failed to load GIF';
+            meme.appendChild(err);
+          };
+          meme.appendChild(img);
+        } else {
+          const empty = document.createElement('div');
+          empty.className = 'pod-meme__empty';
+          empty.textContent = 'Right-click to set a meme GIF';
+          meme.appendChild(empty);
+        }
+
+        const hint = document.createElement('span');
+        hint.className = 'pod-meme__hint';
+        hint.textContent = 'right-click to change';
+        meme.appendChild(hint);
+      }
+
+      // Right-click on meme area to set URL
+      document.getElementById('podMeme').addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        const ps = DataLayer.getPodSettings(pod.shortName);
+        const url = prompt('Enter GIF/meme URL:', ps.memeUrl || '');
+        if (url !== null) {
+          ps.memeUrl = url.trim();
+          DataLayer.savePodSettings(pod.shortName, ps);
+          renderMeme();
+        }
+      });
+
+      // ── Pod Settings Panel ──
+      const settingsOverlay = document.getElementById('podSettingsOverlay');
+
+      document.getElementById('podSettingsBtn').addEventListener('click', () => {
+        const ps = DataLayer.getPodSettings(pod.shortName);
+        document.getElementById('podSettingsBgColor').value = ps.bgColor || '#ffffff';
+        document.getElementById('podSettingsBgImage').value = ps.bgImage || '';
+        document.getElementById('podSettingsBgOpacity').value = ps.bgOpacity || '15';
+        document.getElementById('podSettingsMemeUrl').value = ps.memeUrl || '';
+        document.getElementById('podSettingsCalId').value = ps.calendarId || '';
+        settingsOverlay.classList.add('visible');
+      });
+
+      document.getElementById('podSettingsCancel').addEventListener('click', () => {
+        settingsOverlay.classList.remove('visible');
+      });
+
+      settingsOverlay.addEventListener('click', (e) => {
+        if (e.target === settingsOverlay) settingsOverlay.classList.remove('visible');
+      });
+
+      document.getElementById('podSettingsSave').addEventListener('click', () => {
+        const ps = DataLayer.getPodSettings(pod.shortName);
+        ps.bgColor = document.getElementById('podSettingsBgColor').value;
+        ps.bgImage = document.getElementById('podSettingsBgImage').value.trim();
+        ps.bgOpacity = document.getElementById('podSettingsBgOpacity').value.trim() || '15';
+        ps.memeUrl = document.getElementById('podSettingsMemeUrl').value.trim();
+        ps.calendarId = document.getElementById('podSettingsCalId').value.trim();
+        DataLayer.savePodSettings(pod.shortName, ps);
+        settingsOverlay.classList.remove('visible');
+        applyPodBackground();
+        renderMeme();
+        renderPodSchedule();
+      });
+
+      document.getElementById('podSettingsReset').addEventListener('click', () => {
+        DataLayer.savePodSettings(pod.shortName, {});
+        settingsOverlay.classList.remove('visible');
+        applyPodBackground();
+        renderMeme();
+        renderPodSchedule();
+      });
+
+      // Apply on load
+      applyPodBackground();
+
+      // ── Pod Bulletin ──
+      function renderPodBulletin() {
+        const list = document.getElementById('podBulletinList');
+        list.textContent = '';
+        const items = DataLayer.getPodBulletin(pod.shortName);
+
+        if (items.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'pod-empty';
+          empty.textContent = 'No pod updates yet \u2014 be the first to post!';
+          list.appendChild(empty);
+          return;
+        }
+
+        items.forEach(item => {
+          const el = document.createElement('div');
+          el.className = 'pod-bulletin-item';
+          if (item.highlight) el.style.background = item.highlight;
+
+          const header = document.createElement('div');
+          header.className = 'pod-bulletin-item__header';
+
+          const title = document.createElement('div');
+          title.className = 'pod-bulletin-item__title';
+          if (item.textColor) title.style.color = item.textColor;
+          title.textContent = item.title;
+          header.appendChild(title);
+
+          const del = document.createElement('button');
+          del.className = 'pod-bulletin-item__delete';
+          del.textContent = '\u2715';
+          del.addEventListener('click', () => {
+            DataLayer.removePodBulletinItem(pod.shortName, item.id);
+            renderPodBulletin();
+          });
+          header.appendChild(del);
+          el.appendChild(header);
+
+          if (item.body) {
+            const body = document.createElement('div');
+            body.className = 'pod-bulletin-item__body';
+            body.textContent = item.body;
+            el.appendChild(body);
+          }
+
+          const meta = document.createElement('div');
+          meta.className = 'pod-bulletin-item__meta';
+          const date = new Date(item.createdAt);
+          meta.textContent = (item.author || 'Anonymous') + ' \u00B7 ' + date.toLocaleDateString(undefined, {
+            weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+          });
+          el.appendChild(meta);
+
+          list.appendChild(el);
+        });
+      }
+
+      // Bulletin add form
+      const bulletinForm = document.getElementById('podBulletinForm');
+      document.getElementById('podBulletinAddBtn').addEventListener('click', () => {
+        bulletinForm.classList.toggle('visible');
+        if (bulletinForm.classList.contains('visible')) {
+          document.getElementById('podBulletinTitle').focus();
+        }
+      });
+      document.getElementById('podBulletinCancel').addEventListener('click', () => {
+        bulletinForm.classList.remove('visible');
+      });
+      document.getElementById('podBulletinSave').addEventListener('click', () => {
+        const title = document.getElementById('podBulletinTitle').value.trim();
+        const body = document.getElementById('podBulletinBody').value.trim();
+        if (!title) return;
+        DataLayer.addPodBulletinItem(pod.shortName, { title, body });
+        document.getElementById('podBulletinTitle').value = '';
+        document.getElementById('podBulletinBody').value = '';
+        bulletinForm.classList.remove('visible');
+        renderPodBulletin();
+      });
+
+      // ── Pod Team ──
+      function renderPodTeam() {
+        const list = document.getElementById('podTeamList');
+        list.textContent = '';
+        const sorted = members().sort((a, b) => {
+          const order = { online: 0, away: 1, offline: 2 };
+          return (order[a.status] || 2) - (order[b.status] || 2) || a.name.localeCompare(b.name);
+        });
+
+        document.getElementById('podTeamCount').textContent = sorted.length + ' members';
+
+        const grid = document.createElement('div');
+        grid.className = 'pod-team-list';
+
+        sorted.forEach(m => {
+          const el = document.createElement('div');
+          el.className = 'pod-team-member';
+          el.style.position = 'relative';
+
+          const dot = document.createElement('div');
+          dot.className = 'pod-team-member__dot pod-team-member__dot--' + (m.status || 'offline');
+          el.appendChild(dot);
+
+          const name = document.createElement('span');
+          name.className = 'pod-team-member__name';
+          if (m.role === 'leader') {
+            name.style.color = 'var(--text-primary)';
+            name.style.fontWeight = '700';
+          } else {
+            name.style.color = podColor;
+          }
+          name.textContent = m.name;
+          el.appendChild(name);
+
+          if (m.statusEmoji) {
+            const emoji = document.createElement('span');
+            emoji.className = 'pod-team-member__emoji';
+            emoji.textContent = m.statusEmoji;
+            el.appendChild(emoji);
+          }
+
+          if (m.statusMessage) {
+            const tip = document.createElement('div');
+            tip.className = 'pod-team-member__status-tip';
+            tip.textContent = m.statusMessage;
+            el.appendChild(tip);
+          }
+
+          grid.appendChild(el);
+        });
+
+        list.appendChild(grid);
+      }
+
+      // ── Pod Apps ──
+      function renderPodApps() {
+        const list = document.getElementById('podAppsList');
+        list.textContent = '';
+        const apps = DataLayer.getPodApps(pod.shortName);
+
+        if (apps.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'pod-empty';
+          empty.textContent = 'No pod-specific apps yet. Click + to add one.';
+          list.appendChild(empty);
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'pod-apps-list';
+
+        apps.forEach(app => {
+          const badge = document.createElement('a');
+          badge.className = 'pod-app-badge';
+          badge.href = app.url;
+          badge.target = '_blank';
+
+          const icon = document.createElement('span');
+          icon.className = 'pod-app-badge__icon';
+          icon.textContent = app.icon || '\uD83D\uDD17';
+          badge.appendChild(icon);
+
+          const name = document.createTextNode(app.name);
+          badge.appendChild(name);
+
+          // Admin: right-click to remove
+          if (DataLayer.isAdmin(DataLayer.getUser())) {
+            badge.addEventListener('contextmenu', (e) => {
+              e.preventDefault();
+              if (confirm('Remove ' + app.name + '?')) {
+                DataLayer.removePodApp(pod.shortName, app.id);
+                renderPodApps();
+              }
+            });
+          }
+
+          grid.appendChild(badge);
+        });
+
+        list.appendChild(grid);
+      }
+
+      // App add form
+      const appForm = document.getElementById('podAppForm');
+      document.getElementById('podAppAddBtn').addEventListener('click', () => {
+        appForm.classList.toggle('visible');
+      });
+      document.getElementById('podAppCancel').addEventListener('click', () => {
+        appForm.classList.remove('visible');
+      });
+      document.getElementById('podAppSave').addEventListener('click', () => {
+        const icon = document.getElementById('podAppIcon').value.trim() || '\uD83D\uDD17';
+        const name = document.getElementById('podAppName').value.trim();
+        const url = document.getElementById('podAppUrl').value.trim();
+        if (!name || !url) return;
+        DataLayer.addPodApp(pod.shortName, { icon, name, url });
+        document.getElementById('podAppIcon').value = '';
+        document.getElementById('podAppName').value = '';
+        document.getElementById('podAppUrl').value = '';
+        appForm.classList.remove('visible');
+        renderPodApps();
+      });
+
+      // ── Pod Metrics ──
+      function slaClass(val) {
+        if (val >= 95) return 'pod-metric-card--sla-green';
+        if (val >= 85) return 'pod-metric-card--sla-amber';
+        return 'pod-metric-card--sla-red';
+      }
+
+      function renderPodMetrics() {
+        const container = document.getElementById('podMetrics');
+        container.textContent = '';
+
+        const metrics = [
+          { value: stats.responseSLA, label: 'Response SLA', unit: '%', isSla: true },
+          { value: stats.resolutionSLA, label: 'Resolution SLA', unit: '%', isSla: true },
+          { value: lastIncoming, label: 'Incoming (Week)', unit: '', isSla: false },
+          { value: lastThroughput, label: 'Throughput (Week)', unit: '', isSla: false }
+        ];
+
+        const grid = document.createElement('div');
+        grid.className = 'pod-metrics-grid';
+
+        metrics.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'pod-metric-card';
+          if (m.isSla && typeof m.value === 'number') card.classList.add(slaClass(m.value));
+
+          const val = document.createElement('div');
+          val.className = 'pod-metric-card__value';
+          val.textContent = m.value + m.unit;
+          card.appendChild(val);
+
+          const label = document.createElement('div');
+          label.className = 'pod-metric-card__label';
+          label.textContent = m.label;
+          card.appendChild(label);
+
+          // SLA bar
+          if (m.isSla && typeof m.value === 'number') {
+            const bar = document.createElement('div');
+            bar.className = 'pod-metric-card__bar';
+            const fill = document.createElement('div');
+            fill.className = 'pod-metric-card__bar-fill';
+            fill.style.width = Math.min(m.value, 100) + '%';
+            bar.appendChild(fill);
+            card.appendChild(bar);
+          }
+
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      }
+
+      // ── Pod Schedule ──
+      function renderPodSchedule() {
+        const list = document.getElementById('podScheduleList');
+        list.textContent = '';
+        const items = DataLayer.getPodSchedule(pod.shortName);
+        const today = new Date().toISOString().split('T')[0];
+        const ps = DataLayer.getPodSettings(pod.shortName);
+
+        // Make header clickable to open Google Calendar when configured
+        const titleEl = document.getElementById('podScheduleTitle');
+        titleEl.textContent = '';
+        if (ps.calendarId) {
+          const calUrl = 'https://calendar.google.com/calendar/embed?src=' + encodeURIComponent(ps.calendarId);
+          const link = document.createElement('a');
+          link.href = calUrl;
+          link.target = '_blank';
+          link.style.textDecoration = 'none';
+          link.style.color = 'inherit';
+          link.style.cursor = 'pointer';
+          link.textContent = '\uD83D\uDCC5 Team Schedule';
+          link.title = 'Open in Google Calendar';
+          titleEl.appendChild(link);
+        } else {
+          titleEl.textContent = '\uD83D\uDCC5 Team Schedule';
+        }
+
+        if (items.length === 0 && !ps.calendarId) {
+          const empty = document.createElement('div');
+          empty.className = 'pod-empty';
+          empty.textContent = 'No schedule items. Click + to add PTO, meetings, etc.';
+          list.appendChild(empty);
+          return;
+        }
+
+        // Calendar linked but no manual items
+        if (items.length === 0 && ps.calendarId) {
+          const hint = document.createElement('div');
+          hint.className = 'pod-empty';
+          hint.textContent = 'Calendar linked \u2014 click the title to view. Add manual items with +.';
+          list.appendChild(hint);
+          return;
+        }
+
+        items.forEach(item => {
+          const el = document.createElement('div');
+          el.className = 'pod-schedule-item';
+          if (item.date === today) el.classList.add('pod-schedule-item--today');
+          else if (item.date < today) el.classList.add('pod-schedule-item--past');
+
+          const title = document.createElement('span');
+          title.className = 'pod-schedule-item__title';
+          title.textContent = item.title;
+          el.appendChild(title);
+
+          const date = document.createElement('span');
+          date.className = 'pod-schedule-item__date';
+          const d = new Date(item.date + 'T12:00:00');
+          date.textContent = d.toLocaleDateString(undefined, {
+            weekday: 'short', month: 'short', day: 'numeric'
+          });
+          el.appendChild(date);
+
+          const del = document.createElement('button');
+          del.className = 'pod-schedule-item__delete';
+          del.textContent = '\u2715';
+          del.addEventListener('click', () => {
+            DataLayer.removePodScheduleItem(pod.shortName, item.id);
+            renderPodSchedule();
+          });
+          el.appendChild(del);
+
+          list.appendChild(el);
+        });
+      }
+
+      // Schedule add form
+      const scheduleForm = document.getElementById('podScheduleForm');
+      document.getElementById('podScheduleAddBtn').addEventListener('click', () => {
+        scheduleForm.classList.toggle('visible');
+        if (scheduleForm.classList.contains('visible')) {
+          document.getElementById('podScheduleDate').value = new Date().toISOString().split('T')[0];
+          document.getElementById('podScheduleTitle').focus();
+        }
+      });
+      document.getElementById('podScheduleCancel').addEventListener('click', () => {
+        scheduleForm.classList.remove('visible');
+      });
+      document.getElementById('podScheduleSave').addEventListener('click', () => {
+        const title = document.getElementById('podScheduleTitle').value.trim();
+        const date = document.getElementById('podScheduleDate').value;
+        if (!title || !date) return;
+        DataLayer.addPodScheduleItem(pod.shortName, { title, date });
+        document.getElementById('podScheduleTitle').value = '';
+        scheduleForm.classList.remove('visible');
+        renderPodSchedule();
+      });
+
+      // ── Shared ETS Apps Strip ──
+      function renderAppsStrip() {
+        const strip = document.getElementById('appsStrip');
+        const apps = DataLayer.getCertifiedApps();
+        apps.forEach(app => {
+          const badge = document.createElement('a');
+          badge.className = 'app-badge';
+          badge.href = app.url;
+          badge.target = '_blank';
+          const icon = document.createElement('span');
+          icon.className = 'app-badge__icon';
+          icon.textContent = app.icon;
+          badge.appendChild(icon);
+          badge.appendChild(document.createTextNode(app.name));
+          strip.appendChild(badge);
+        });
+      }
+
+      // ── Initial Render ──
+      renderPodBulletin();
+      renderMeme();
+      renderPodTeam();
+      renderPodSchedule();
+      renderPodApps();
+      renderPodMetrics();
+      renderAppsStrip();
+
+      // ── Auto-Refresh ──
+      setInterval(async () => {
+        await DataLayer.load();
+        renderPodTeam();
+        renderPodSchedule();
+        renderPodMetrics();
+        Stickers.renderStickers();
+        document.getElementById('lastUpdatedTime').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      }, 15000);
+    })();
+  </script>
+
+</body>
+</html>
