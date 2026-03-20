@@ -1012,12 +1012,9 @@ html, body {
 }
 .sticker-bubble:hover .sticker-bubble__tooltip { opacity: 1; }
 
-/* Thought bubble — snug cloud above sticker */
+/* Thought bubble — varies position around sticker */
 .sticker-bubble__thought {
   position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  transform: translateX(-50%);
   background: white;
   border: 1.5px solid #D1D5DB;
   border-radius: 10px;
@@ -1035,16 +1032,43 @@ html, body {
 .sticker-bubble__thought::after {
   content: '';
   position: absolute;
-  bottom: -4px;
-  left: 50%;
   width: 6px;
   height: 6px;
   background: white;
   border: 1.5px solid #D1D5DB;
-  border-top: none;
-  border-left: none;
-  transform: translateX(-50%) rotate(45deg);
 }
+
+/* pos0: top center */
+.sticker-bubble__thought--pos0 { bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); }
+.sticker-bubble__thought--pos0::after { bottom: -4px; left: 50%; transform: translateX(-50%) rotate(45deg); border-top: none; border-left: none; }
+
+/* pos1: top-right */
+.sticker-bubble__thought--pos1 { bottom: calc(100% + 2px); left: calc(100% - 6px); }
+.sticker-bubble__thought--pos1::after { bottom: -4px; left: 10px; transform: rotate(45deg); border-top: none; border-left: none; }
+
+/* pos2: right */
+.sticker-bubble__thought--pos2 { left: calc(100% + 2px); top: 50%; transform: translateY(-50%); }
+.sticker-bubble__thought--pos2::after { left: -4px; top: 50%; transform: translateY(-50%) rotate(-45deg); border-top: none; border-right: none; }
+
+/* pos3: bottom-right */
+.sticker-bubble__thought--pos3 { top: calc(100% + 2px); left: calc(100% - 6px); }
+.sticker-bubble__thought--pos3::after { top: -4px; left: 10px; transform: rotate(-135deg); border-top: none; border-left: none; }
+
+/* pos4: bottom center */
+.sticker-bubble__thought--pos4 { top: calc(100% + 2px); left: 50%; transform: translateX(-50%); }
+.sticker-bubble__thought--pos4::after { top: -4px; left: 50%; transform: translateX(-50%) rotate(-135deg); border-top: none; border-left: none; }
+
+/* pos5: bottom-left */
+.sticker-bubble__thought--pos5 { top: calc(100% + 2px); right: calc(100% - 6px); }
+.sticker-bubble__thought--pos5::after { top: -4px; right: 10px; transform: rotate(-135deg); border-top: none; border-left: none; }
+
+/* pos6: left */
+.sticker-bubble__thought--pos6 { right: calc(100% + 2px); top: 50%; transform: translateY(-50%); }
+.sticker-bubble__thought--pos6::after { right: -4px; top: 50%; transform: translateY(-50%) rotate(45deg); border-bottom: none; border-left: none; }
+
+/* pos7: top-left */
+.sticker-bubble__thought--pos7 { bottom: calc(100% + 2px); right: calc(100% - 6px); }
+.sticker-bubble__thought--pos7::after { bottom: -4px; right: 10px; transform: rotate(45deg); border-top: none; border-left: none; }
 
 /* Sticker context menu */
 .sticker-ctx-menu {

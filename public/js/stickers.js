@@ -230,9 +230,13 @@ const Stickers = (() => {
       const timeAgo = formatTimeAgo(sticker.placedAt);
       const customText = sticker.tooltipText || '';
       if (customText) {
-        // Show thought bubble with custom text
+        // Assign a random position if none exists yet
+        if (sticker.thoughtPos === undefined || sticker.thoughtPos === null) {
+          sticker.thoughtPos = Math.floor(Math.random() * 8);
+          _saveStickerField(sticker.id, 'thoughtPos', sticker.thoughtPos);
+        }
         const thought = document.createElement('div');
-        thought.className = 'sticker-bubble__thought';
+        thought.className = 'sticker-bubble__thought sticker-bubble__thought--pos' + sticker.thoughtPos;
         thought.textContent = customText;
         el.appendChild(thought);
       }
@@ -277,7 +281,13 @@ const Stickers = (() => {
     const nx = parseInt(el.style.left) / window.innerWidth;
     const ny = parseInt(el.style.top) / window.innerHeight;
     DataLayer.updateStickerPosition(_dragState.id, nx, ny);
+
+    // Randomize thought bubble position on every move
+    const newPos = Math.floor(Math.random() * 8);
+    _saveStickerField(_dragState.id, 'thoughtPos', newPos);
+
     _dragState = null;
+    renderStickers();
   });
 
   // ── Sticker Context Menu ──
@@ -392,6 +402,16 @@ const Stickers = (() => {
   }
 
   // ── Helpers ──
+
+  // Save a single field on a sticker without replacing the whole array
+  function _saveStickerField(id, field, value) {
+    const all = DataLayer.loadStickers();
+    const target = all.find(s => s.id === id);
+    if (target) {
+      target[field] = value;
+      DataLayer.saveStickers(all);
+    }
+  }
 
   function formatTimeAgo(iso) {
     const diff = Date.now() - new Date(iso).getTime();
