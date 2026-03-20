@@ -1418,6 +1418,117 @@ body.placing-sticker { cursor: crosshair; }
   font-style: italic;
 }
 
+/* ══════════════════════════════════════════════
+   Responsive: Compact pod icons at narrow widths
+   ══════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  /* Collapse 3-column layout to stacked */
+  .main {
+    grid-template-columns: auto 1fr 1fr;
+    gap: 10px;
+    padding: 8px 12px;
+  }
+
+  /* Pod grid: single column of compact icons */
+  .pods-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, auto);
+    gap: 6px;
+  }
+
+  .pods-col {
+    min-width: 56px;
+    max-width: 56px;
+  }
+
+  .pods-week {
+    font-size: 0;      /* hide week label text */
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* Pod card: compact vertical icon pill */
+  .pod-card {
+    padding: 6px 4px;
+    border-radius: 10px;
+    min-height: 0;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-left: none;
+    border-bottom: 3px solid var(--pod-color, #94A3B8);
+    position: relative;
+  }
+
+  .pod-card:hover {
+    transform: translateY(-1px);
+  }
+
+  /* Show only the bg-icon as the main visual */
+  .pod-card__bg-icon {
+    position: static;
+    transform: none;
+    font-size: 22px;
+    opacity: 1;
+    filter: none;
+    -webkit-text-fill-color: unset;
+    color: var(--pod-color, #666);
+  }
+
+  /* Pod name becomes tiny label below icon */
+  .pod-card__name {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--pod-color, var(--text-primary));
+    line-height: 1;
+  }
+
+  /* Hide everything else */
+  .pod-card__team-size,
+  .pod-card__fullname,
+  .pod-card__indicators,
+  .pod-card__chart,
+  .pod-card__sla,
+  .pod-card__header {
+    display: none !important;
+  }
+
+  /* Re-show name outside header since header is hidden */
+  .pod-card::after {
+    content: attr(data-pod-name);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--pod-color, var(--text-primary));
+    line-height: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 650px) {
+  /* Stack everything vertically on very narrow */
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .pods-col {
+    min-width: unset;
+    max-width: unset;
+  }
+
+  /* Pod grid becomes horizontal row */
+  .pods-grid {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr;
+  }
+}
+
 /* ── Utility ── */
 .sr-only {
   position: absolute;

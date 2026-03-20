@@ -140,9 +140,19 @@ const App = (() => {
       card.className = 'pod-card';
       card.style.setProperty('--pod-color', color);
       card.style.borderLeftColor = color;
+      card.dataset.podName = pod.shortName;
       card.addEventListener('click', () => {
         window.location.href = 'pod.html?id=' + pod.id;
       });
+
+      // Card-level tooltip for compact mode (stats summary)
+      const stats = pod.stats || {};
+      card.title = pod.fullName
+        + '\nTeam: ' + (stats.teamSize || '?')
+        + '  |  Resp SLA: ' + (stats.responseSLA || '?') + '%'
+        + '  |  Res SLA: ' + (stats.resolutionSLA || '?') + '%'
+        + '\nBreaches: ' + (stats.totalBreaches || 0)
+        + '  |  Escalations: ' + (stats.totalEscalations || 0);
 
       // Background icon — use pod settings override or default emoji
       const podSettings = DataLayer.getPodSettings ? DataLayer.getPodSettings(pod.shortName) : {};
