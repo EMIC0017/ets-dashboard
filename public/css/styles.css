@@ -1012,16 +1012,16 @@ html, body {
 }
 .sticker-bubble:hover .sticker-bubble__tooltip { opacity: 1; }
 
-/* Thought bubble — cloud shape above sticker */
+/* Thought bubble — snug cloud above sticker */
 .sticker-bubble__thought {
   position: absolute;
-  bottom: calc(100% + 16px);
+  bottom: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
   background: white;
   border: 1.5px solid #D1D5DB;
-  border-radius: 12px;
-  padding: 3px 8px;
+  border-radius: 10px;
+  padding: 2px 7px;
   font-size: 10px;
   font-weight: 600;
   color: #374151;
@@ -1029,34 +1029,21 @@ html, body {
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   z-index: 51;
 }
 .sticker-bubble__thought::after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: -4px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: white;
   border: 1.5px solid #D1D5DB;
   border-top: none;
   border-left: none;
-  border-radius: 0 0 50% 0;
   transform: translateX(-50%) rotate(45deg);
-}
-.sticker-bubble__thought::before {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: calc(50% + 6px);
-  width: 5px;
-  height: 5px;
-  background: white;
-  border: 1px solid #D1D5DB;
-  border-radius: 50%;
 }
 
 /* Sticker context menu */
