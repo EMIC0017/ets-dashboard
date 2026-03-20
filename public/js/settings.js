@@ -157,6 +157,19 @@ const Settings = (() => {
     activeRow.appendChild(activeToggle);
     bannerSection.appendChild(activeRow);
 
+    // Scroll ticker toggle
+    const scrollRow = document.createElement('div');
+    scrollRow.className = 'settings-toggle';
+    scrollRow.style.marginTop = '4px';
+    const scrollLabel = document.createElement('span');
+    scrollLabel.className = 'settings-toggle__label';
+    scrollLabel.textContent = 'Scroll as ticker';
+    scrollRow.appendChild(scrollLabel);
+    const isScrolling = localStorage.getItem('ets_banner_scroll') === 'true';
+    const scrollToggle = createToggleInput(isScrolling, () => {});
+    scrollRow.appendChild(scrollToggle);
+    bannerSection.appendChild(scrollRow);
+
     // Save button
     const bannerSaveBtn = document.createElement('button');
     bannerSaveBtn.className = 'settings-btn';
@@ -169,6 +182,10 @@ const Settings = (() => {
 
       // Save banner color
       DataLayer.saveBannerColor(bannerColorInput.value);
+
+      // Save scroll preference
+      const shouldScroll = scrollToggle.querySelector('input').checked;
+      localStorage.setItem('ets_banner_scroll', shouldScroll ? 'true' : 'false');
 
       // Save announcement
       const updated = [{

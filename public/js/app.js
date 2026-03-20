@@ -101,6 +101,26 @@ const App = (() => {
       banner.style.setProperty('--banner-color', bannerColor);
       banner.style.background = bannerColor;
     }
+
+    // Ticker scroll mode
+    const shouldScroll = localStorage.getItem('ets_banner_scroll') === 'true';
+    banner.classList.toggle('banner--ticker', shouldScroll);
+    if (shouldScroll && !text.querySelector('.banner__ticker-text')) {
+      // Move existing children into a scrolling wrapper
+      const ticker = document.createElement('span');
+      ticker.className = 'banner__ticker-text';
+      while (text.firstChild) {
+        ticker.appendChild(text.firstChild);
+      }
+      text.appendChild(ticker);
+    } else if (!shouldScroll && text.querySelector('.banner__ticker-text')) {
+      // Unwrap ticker back to normal
+      const ticker = text.querySelector('.banner__ticker-text');
+      while (ticker.firstChild) {
+        text.appendChild(ticker.firstChild);
+      }
+      ticker.remove();
+    }
   }
 
   // ── Week Ending Label ──
