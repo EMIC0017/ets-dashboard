@@ -321,7 +321,7 @@ const App = (() => {
     // Replace to clear old listeners
     const newAddBtn = addBtn.cloneNode(true);
     addBtn.parentNode.replaceChild(newAddBtn, addBtn);
-    newAddBtn.addEventListener('click', () => toggleBulletinForm(list));
+    newAddBtn.addEventListener('click', () => toggleBulletinForm());
 
     if (bulletin.length === 0) {
       const empty = document.createElement('div');
@@ -392,28 +392,41 @@ const App = (() => {
     });
   }
 
-  // ── Bulletin Add Form ──
+  // ── Bulletin Add Form (Modal Overlay) ──
 
-  function toggleBulletinForm(listEl) {
-    // If form already visible, remove it
-    const existing = document.getElementById('bulletinAddForm');
-    if (existing) { existing.remove(); return; }
+  let _bulletinModal = null;
 
-    const form = document.createElement('div');
-    form.id = 'bulletinAddForm';
-    form.className = 'bulletin-add-form';
+  function toggleBulletinForm() {
+    // If modal already open, close it
+    if (_bulletinModal) { _closeBulletinModal(); return; }
+
+    // Overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'bulletin-modal-overlay';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) _closeBulletinModal();
+    });
+
+    // Modal panel
+    const panel = document.createElement('div');
+    panel.className = 'bulletin-modal';
+
+    const heading = document.createElement('div');
+    heading.className = 'bulletin-modal__heading';
+    heading.textContent = 'New Bulletin Post';
+    panel.appendChild(heading);
 
     const titleInput = document.createElement('input');
     titleInput.type = 'text';
     titleInput.className = 'bulletin-add-form__input';
     titleInput.placeholder = 'Title (e.g. \uD83D\uDE80 New Feature Shipped!)';
-    form.appendChild(titleInput);
+    panel.appendChild(titleInput);
 
     const bodyInput = document.createElement('textarea');
     bodyInput.className = 'bulletin-add-form__textarea';
     bodyInput.placeholder = 'Details...';
-    bodyInput.rows = 2;
-    form.appendChild(bodyInput);
+    bodyInput.rows = 3;
+    panel.appendChild(bodyInput);
 
     // Color row
     const colorRow = document.createElement('div');
@@ -444,7 +457,7 @@ const App = (() => {
       });
       colorRow.appendChild(btn);
     });
-    form.appendChild(colorRow);
+    panel.appendChild(colorRow);
 
     // Actions
     const actions = document.createElement('div');
@@ -463,7 +476,7 @@ const App = (() => {
         highlight: selectedColor.bg,
         textColor: selectedColor.text
       });
-      form.remove();
+      _closeBulletinModal();
       renderBulletin();
     });
     actions.appendChild(postBtn);
@@ -471,14 +484,29 @@ const App = (() => {
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'bulletin-add-form__cancel';
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.addEventListener('click', () => form.remove());
+    cancelBtn.addEventListener('click', _closeBulletinModal);
     actions.appendChild(cancelBtn);
 
-    form.appendChild(actions);
+    panel.appendChild(actions);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    _bulletinModal = overlay;
 
-    // Insert form at top of list
-    listEl.insertBefore(form, listEl.firstChild);
+    // Animate in
+    requestAnimationFrame(() => overlay.classList.add('visible'));
     titleInput.focus();
+
+    // Escape to close
+    overlay._onKey = (e) => { if (e.key === 'Escape') _closeBulletinModal(); };
+    document.addEventListener('keydown', overlay._onKey);
+  }
+
+  function _closeBulletinModal() {
+    if (_bulletinModal) {
+      document.removeEventListener('keydown', _bulletinModal._onKey);
+      _bulletinModal.remove();
+      _bulletinModal = null;
+    }
   }
 
   // ── Spotlight (Tip of the Week / Team Member of the Week) ──

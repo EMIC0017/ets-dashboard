@@ -491,11 +491,41 @@ html, body {
   transform: scale(1.1);
 }
 
-/* Bulletin Add Form */
+/* Bulletin Modal Overlay */
+.bulletin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+.bulletin-modal-overlay.visible { opacity: 1; }
+.bulletin-modal {
+  background: white;
+  border-radius: 14px;
+  padding: 20px 24px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translateY(10px);
+  transition: transform var(--transition-fast);
+}
+.bulletin-modal-overlay.visible .bulletin-modal { transform: translateY(0); }
+.bulletin-modal__heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Bulletin Add Form (shared input styles) */
 .bulletin-add-form {
-  padding: 10px 0 12px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 4px;
   display: flex;
   flex-direction: column;
   gap: 6px;
