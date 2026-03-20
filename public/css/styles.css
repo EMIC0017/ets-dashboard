@@ -981,7 +981,7 @@ html, body {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.45);
   box-shadow: var(--shadow-md);
   font-size: 24px;
   display: flex;
