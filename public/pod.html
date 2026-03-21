@@ -616,6 +616,7 @@
           <div>AHT</div>
         </div>
         <div class="pod-header__stat-divider"></div>
+        <button class="header__profile" id="profileBtn" title="My Profile" style="position:static;transform:none;"></button>
         <button class="pod-page__settings-btn" id="podSettingsBtn" title="Pod Settings">⚙</button>
       </div>
     </div>
@@ -787,6 +788,200 @@
       // ── Stickers (pod-scoped) ──
       DataLayer.setStickerScope(pod.shortName);
       Stickers.init();
+
+      // ── Profile Button ──
+      (function initPodProfileButton() {
+        const btn = document.getElementById('profileBtn');
+        if (!btn) return;
+        const profile = DataLayer.getUserProfile();
+        btn.textContent = profile.statusIcon || '\uD83D\uDC64';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePodProfileDropdown(btn);
+        });
+      })();
+
+      let _podProfileDD = null;
+      function togglePodProfileDropdown(anchorBtn) {
+        if (_podProfileDD) { _podProfileDD.remove(); _podProfileDD = null; return; }
+        const profile = DataLayer.getUserProfile();
+        const userName = DataLayer.getUser() || 'Anonymous';
+
+        const dd = document.createElement('div');
+        dd.className = 'profile-dropdown';
+        const rect = anchorBtn.getBoundingClientRect();
+        dd.style.top = (rect.bottom + 8) + 'px';
+        dd.style.right = (window.innerWidth - rect.right) + 'px';
+
+        const header = document.createElement('div');
+        header.className = 'profile-dropdown__header';
+        const ns = document.createElement('span');
+        ns.className = 'profile-dropdown__name';
+        ns.textContent = userName;
+        header.appendChild(ns);
+        dd.appendChild(header);
+
+        // Icon section
+        const iconLabel = document.createElement('div');
+        iconLabel.className = 'profile-dropdown__section-label';
+        iconLabel.textContent = 'Status Icon';
+        dd.appendChild(iconLabel);
+
+        let _selectedIcon = profile.statusIcon || '';
+        function _selectIcon(emoji) {
+          _selectedIcon = emoji;
+          dd.querySelectorAll('.profile-dropdown__icon-btn').forEach(b => {
+            b.classList.toggle('profile-dropdown__icon-btn--active',
+              emoji ? b.textContent === emoji : b.classList.contains('profile-dropdown__icon-btn--clear'));
+          });
+        }
+
+        // Recent icons
+        const recentIcons = DataLayer.getRecentProfileIcons();
+        if (recentIcons.length > 0) {
+          const recentRow = document.createElement('div');
+          recentRow.className = 'profile-dropdown__icon-row';
+          recentRow.style.marginBottom = '4px';
+          const rl = document.createElement('span');
+          rl.style.cssText = 'font-size:9px;color:var(--text-muted);align-self:center;margin-right:2px;';
+          rl.textContent = 'Recent';
+          recentRow.appendChild(rl);
+          recentIcons.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'profile-dropdown__icon-btn' + (emoji === profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+            btn.textContent = emoji;
+            btn.addEventListener('click', () => _selectIcon(emoji));
+            recentRow.appendChild(btn);
+          });
+          dd.appendChild(recentRow);
+        }
+
+        const iconRow = document.createElement('div');
+        iconRow.className = 'profile-dropdown__icon-row';
+        const quickIcons = ['\uD83D\uDFE2','\uD83D\uDD34','\uD83D\uDCC5','\uD83D\uDCF9','\uD83C\uDFE0','\uD83C\uDFA7','\u2615','\uD83D\uDCDE','\uD83D\uDE34','\uD83D\uDEAB','\u2708\uFE0F','\uD83D\uDE97'];
+
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'profile-dropdown__icon-btn profile-dropdown__icon-btn--clear' + (!profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+        clearBtn.textContent = 'None';
+        clearBtn.addEventListener('click', () => _selectIcon(''));
+        iconRow.appendChild(clearBtn);
+
+        quickIcons.forEach(emoji => {
+          const btn = document.createElement('button');
+          btn.className = 'profile-dropdown__icon-btn' + (emoji === profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+          btn.textContent = emoji;
+          btn.addEventListener('click', () => _selectIcon(emoji));
+          iconRow.appendChild(btn);
+        });
+        dd.appendChild(iconRow);
+
+        // Search row
+        const searchRow = document.createElement('div');
+        searchRow.style.cssText = 'display:flex;gap:4px;';
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.className = 'profile-dropdown__input';
+        searchInput.placeholder = 'Search more icons...';
+        searchInput.style.cssText = 'flex:1;height:28px;padding-right:8px;font-size:11px;';
+        searchRow.appendChild(searchInput);
+        dd.appendChild(searchRow);
+
+        const searchResults = document.createElement('div');
+        searchResults.className = 'profile-dropdown__icon-row';
+        searchResults.style.display = 'none';
+        dd.appendChild(searchResults);
+
+        let _sd = null;
+        searchInput.addEventListener('input', () => {
+          clearTimeout(_sd);
+          _sd = setTimeout(() => {
+            const q = searchInput.value.trim();
+            if (!q) { searchResults.style.display = 'none'; return; }
+            searchResults.style.display = 'flex';
+            searchResults.textContent = '';
+            const res = (typeof EmojiData !== 'undefined') ? EmojiData.search(q, 16) : [];
+            res.forEach(emoji => {
+              const btn = document.createElement('button');
+              btn.className = 'profile-dropdown__icon-btn';
+              btn.textContent = emoji;
+              btn.addEventListener('click', () => _selectIcon(emoji));
+              searchResults.appendChild(btn);
+            });
+          }, 150);
+        });
+        searchInput.addEventListener('keydown', (e) => e.stopPropagation());
+
+        // Tooltip text
+        const tooltipLabel = document.createElement('div');
+        tooltipLabel.className = 'profile-dropdown__section-label';
+        tooltipLabel.textContent = 'Status Text';
+        dd.appendChild(tooltipLabel);
+
+        // Recent texts
+        const recentTexts = DataLayer.getRecentProfileTexts();
+        if (recentTexts.length > 0) {
+          const textsRow = document.createElement('div');
+          textsRow.className = 'profile-dropdown__recent-texts';
+          recentTexts.forEach(text => {
+            const chip = document.createElement('button');
+            chip.className = 'profile-dropdown__recent-chip';
+            chip.textContent = text;
+            chip.title = text;
+            chip.addEventListener('click', () => {
+              tooltipInput.value = text;
+              cc.textContent = text.length + '/15';
+            });
+            textsRow.appendChild(chip);
+          });
+          dd.appendChild(textsRow);
+        }
+
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'profile-dropdown__input-wrap';
+        const tooltipInput = document.createElement('input');
+        tooltipInput.type = 'text';
+        tooltipInput.className = 'profile-dropdown__input';
+        tooltipInput.value = profile.tooltipText || '';
+        tooltipInput.placeholder = 'e.g. In meetings...';
+        tooltipInput.maxLength = 15;
+        inputWrap.appendChild(tooltipInput);
+
+        const cc = document.createElement('span');
+        cc.className = 'profile-dropdown__charcount';
+        cc.textContent = (profile.tooltipText || '').length + '/15';
+        inputWrap.appendChild(cc);
+        tooltipInput.addEventListener('input', () => { cc.textContent = tooltipInput.value.length + '/15'; });
+        tooltipInput.addEventListener('keydown', (e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') saveBtn.click();
+          if (e.key === 'Escape') { _podProfileDD.remove(); _podProfileDD = null; }
+        });
+        dd.appendChild(inputWrap);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'profile-dropdown__save';
+        saveBtn.textContent = 'Save Profile';
+        saveBtn.addEventListener('click', () => {
+          DataLayer.saveUserProfile({ statusIcon: _selectedIcon, tooltipText: tooltipInput.value.trim().slice(0, 15) });
+          anchorBtn.textContent = _selectedIcon || '\uD83D\uDC64';
+          _podProfileDD.remove();
+          _podProfileDD = null;
+          renderPodTeam();
+        });
+        dd.appendChild(saveBtn);
+
+        document.body.appendChild(dd);
+        _podProfileDD = dd;
+        requestAnimationFrame(() => dd.classList.add('visible'));
+
+        setTimeout(() => {
+          document.addEventListener('mousedown', function _oc(e) {
+            if (dd.contains(e.target) || e.target === anchorBtn) return;
+            document.removeEventListener('mousedown', _oc);
+            dd.remove(); _podProfileDD = null;
+          });
+        }, 0);
+      }
 
       // ── Pod Background & Meme ──
       function applyPodBackground() {
@@ -1010,7 +1205,10 @@
           } else {
             name.style.color = podColor;
           }
-          name.textContent = m.name;
+          // Abbreviate: "Eric Morin" → "Eric M."
+          const np = m.name.split(' ');
+          name.textContent = np.length > 1 ? np[0] + ' ' + np[np.length - 1][0] + '.' : m.name;
+          name.title = m.name; // full name on hover
           el.appendChild(name);
 
           if (m.statusEmoji) {
@@ -1018,6 +1216,20 @@
             emoji.className = 'pod-team-member__emoji';
             emoji.textContent = m.statusEmoji;
             el.appendChild(emoji);
+          }
+
+          // Profile icon for current user
+          const currentUser = DataLayer.getUser();
+          if (currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+            const profile = DataLayer.getUserProfile();
+            if (profile.statusIcon) {
+              const profIcon = document.createElement('span');
+              profIcon.className = 'member-profile-icon';
+              profIcon.style.cssText = 'font-size:11px;flex-shrink:0;cursor:default;';
+              profIcon.textContent = profile.statusIcon;
+              if (profile.tooltipText) profIcon.title = profile.tooltipText;
+              el.appendChild(profIcon);
+            }
           }
 
           if (m.statusMessage) {

@@ -32,6 +32,7 @@
     <div class="header">
       <div class="header__title">Welcome to ETS</div>
       <div class="header__subtitle" id="headerSubtitle"></div>
+      <button class="header__profile" id="profileBtn" title="My Profile"></button>
       <button class="header__settings" id="settingsBtn" title="Settings">⚙</button>
     </div>
 
@@ -53,8 +54,9 @@
         </div>
         <div class="section-card" id="bulletinSection" style="flex:1;">
           <div class="section-card__header">
-            <span>📌 Bulletin Board</span>
             <button class="bulletin-add-btn" id="bulletinAddBtn" title="New post">+</button>
+            <span class="vt-icon">📌</span>
+            <span>Bulletin Board</span>
           </div>
           <div class="section-card__body" id="bulletinList">
             <!-- Rendered by JS -->
@@ -68,7 +70,7 @@
           <!-- Rendered by JS -->
         </div>
         <div class="team-status" id="teamStatusSection">
-          <div class="team-status__header"><a href="https://docs.google.com/spreadsheets/d/1gmNFKLkWRO71E36bwBtjuZWNJ6t60C_S/edit?usp=sharing" target="_blank" title="Open ETS Org Roster" style="text-decoration:none;color:inherit;">👥</a> Team Status</div>
+          <div class="team-status__header"><a href="https://docs.google.com/spreadsheets/d/1gmNFKLkWRO71E36bwBtjuZWNJ6t60C_S/edit?usp=sharing" target="_blank" title="Open ETS Org Roster" class="vt-icon" style="text-decoration:none;color:inherit;">👥</a> <span>Team Status</span></div>
           <div class="team-status__list" id="teamList">
             <!-- Rendered by JS -->
           </div>
@@ -110,12 +112,14 @@
   </div>
 
   <!-- Scripts (cache-bust v5) -->
-  <script src="js/data.js?v=5"></script>
-  <script src="js/emoji-data.js?v=5"></script>
-  <script src="js/stickers.js?v=5"></script>
-  <script src="js/slack-status.js?v=5"></script>
-  <script src="js/settings.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-client.js?v=1"></script>
+  <script src="js/data.js?v=6"></script>
+  <script src="js/emoji-data.js?v=6"></script>
+  <script src="js/stickers.js?v=6"></script>
+  <script src="js/slack-status.js?v=6"></script>
+  <script src="js/settings.js?v=6"></script>
+  <script src="js/app.js?v=6"></script>
 
 </body>
 </html>

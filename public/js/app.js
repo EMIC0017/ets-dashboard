@@ -18,6 +18,7 @@ const App = (() => {
     await DataLayer.load();
     Settings.init();
     Stickers.init();
+    initProfileButton();
     render();
     applyVisibility();
 
@@ -54,6 +55,244 @@ const App = (() => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') submit();
     });
+  }
+
+  // ── Profile Button ──
+
+  let _profileDropdown = null;
+
+  function initProfileButton() {
+    const btn = document.getElementById('profileBtn');
+    if (!btn) return;
+    updateProfileButtonFace(btn);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleProfileDropdown(btn);
+    });
+  }
+
+  function updateProfileButtonFace(btn) {
+    if (!btn) btn = document.getElementById('profileBtn');
+    if (!btn) return;
+    const profile = DataLayer.getUserProfile();
+    btn.textContent = profile.statusIcon || '\uD83D\uDC64'; // 👤 default
+  }
+
+  function toggleProfileDropdown(anchorBtn) {
+    if (_profileDropdown) { _closeProfileDropdown(); return; }
+
+    const profile = DataLayer.getUserProfile();
+    const userName = DataLayer.getUser() || 'Anonymous';
+
+    const dd = document.createElement('div');
+    dd.className = 'profile-dropdown';
+
+    // Position below the button
+    const rect = anchorBtn.getBoundingClientRect();
+    dd.style.top = (rect.bottom + 8) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
+
+    // Header with name
+    const header = document.createElement('div');
+    header.className = 'profile-dropdown__header';
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'profile-dropdown__name';
+    nameSpan.textContent = userName;
+    header.appendChild(nameSpan);
+    dd.appendChild(header);
+
+    // Status Icon section
+    const iconLabel = document.createElement('div');
+    iconLabel.className = 'profile-dropdown__section-label';
+    iconLabel.textContent = 'Status Icon';
+    dd.appendChild(iconLabel);
+
+    let _selectedIcon = profile.statusIcon || '';
+
+    // Helper to select an icon and update all rows
+    function _selectIcon(emoji) {
+      _selectedIcon = emoji;
+      dd.querySelectorAll('.profile-dropdown__icon-btn').forEach(b => {
+        b.classList.toggle('profile-dropdown__icon-btn--active',
+          emoji ? b.textContent === emoji : b.classList.contains('profile-dropdown__icon-btn--clear'));
+      });
+    }
+
+    // Recent icons row (if any)
+    const recentIcons = DataLayer.getRecentProfileIcons();
+    if (recentIcons.length > 0) {
+      const recentRow = document.createElement('div');
+      recentRow.className = 'profile-dropdown__icon-row';
+      recentRow.style.marginBottom = '4px';
+
+      const recentLabel = document.createElement('span');
+      recentLabel.style.cssText = 'font-size:9px;color:var(--text-muted);align-self:center;margin-right:2px;';
+      recentLabel.textContent = 'Recent';
+      recentRow.appendChild(recentLabel);
+
+      recentIcons.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'profile-dropdown__icon-btn'
+          + (emoji === profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+        btn.textContent = emoji;
+        btn.addEventListener('click', () => _selectIcon(emoji));
+        recentRow.appendChild(btn);
+      });
+      dd.appendChild(recentRow);
+    }
+
+    const iconRow = document.createElement('div');
+    iconRow.className = 'profile-dropdown__icon-row';
+
+    // Quick-pick popular work status emojis
+    const quickIcons = [
+      '\uD83D\uDFE2', '\uD83D\uDD34', '\uD83D\uDCC5', '\uD83D\uDCF9', // 🟢🔴📅📹
+      '\uD83C\uDFE0', '\uD83C\uDFA7', '\u2615', '\uD83D\uDCDE',       // 🏠🎧☕📞
+      '\uD83D\uDE34', '\uD83D\uDEAB', '\u2708\uFE0F', '\uD83D\uDE97'  // 😴🚫✈️🚗
+    ]; // 🟢🔴📅📹🏠🎧☕📞😴🚫✈️🚗
+
+    // "Clear" button
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'profile-dropdown__icon-btn profile-dropdown__icon-btn--clear'
+      + (!profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+    clearBtn.textContent = 'None';
+    clearBtn.addEventListener('click', () => _selectIcon(''));
+    iconRow.appendChild(clearBtn);
+
+    quickIcons.forEach(emoji => {
+      const btn = document.createElement('button');
+      btn.className = 'profile-dropdown__icon-btn'
+        + (emoji === profile.statusIcon ? ' profile-dropdown__icon-btn--active' : '');
+      btn.textContent = emoji;
+      btn.addEventListener('click', () => _selectIcon(emoji));
+      iconRow.appendChild(btn);
+    });
+    dd.appendChild(iconRow);
+
+    // Custom icon via search
+    const searchRow = document.createElement('div');
+    searchRow.style.cssText = 'display:flex;gap:4px;align-items:center;';
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'profile-dropdown__input';
+    searchInput.placeholder = 'Search more icons...';
+    searchInput.style.cssText = 'flex:1;height:28px;padding-right:8px;font-size:11px;';
+    searchRow.appendChild(searchInput);
+    dd.appendChild(searchRow);
+
+    const searchResults = document.createElement('div');
+    searchResults.className = 'profile-dropdown__icon-row';
+    searchResults.style.display = 'none';
+    dd.appendChild(searchResults);
+
+    let _searchDebounce = null;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(_searchDebounce);
+      _searchDebounce = setTimeout(() => {
+        const q = searchInput.value.trim();
+        if (!q) { searchResults.style.display = 'none'; return; }
+        searchResults.style.display = 'flex';
+        searchResults.textContent = '';
+        const results = (typeof EmojiData !== 'undefined') ? EmojiData.search(q, 16) : [];
+        results.forEach(emoji => {
+          const btn = document.createElement('button');
+          btn.className = 'profile-dropdown__icon-btn';
+          btn.textContent = emoji;
+          btn.addEventListener('click', () => _selectIcon(emoji));
+          searchResults.appendChild(btn);
+        });
+      }, 150);
+    });
+    searchInput.addEventListener('keydown', (e) => e.stopPropagation());
+
+    // Tooltip text section
+    const tooltipLabel = document.createElement('div');
+    tooltipLabel.className = 'profile-dropdown__section-label';
+    tooltipLabel.textContent = 'Status Text';
+    dd.appendChild(tooltipLabel);
+
+    // Recent texts as clickable chips
+    const recentTexts = DataLayer.getRecentProfileTexts();
+    if (recentTexts.length > 0) {
+      const textsRow = document.createElement('div');
+      textsRow.className = 'profile-dropdown__recent-texts';
+      recentTexts.forEach(text => {
+        const chip = document.createElement('button');
+        chip.className = 'profile-dropdown__recent-chip';
+        chip.textContent = text;
+        chip.title = text;
+        chip.addEventListener('click', () => {
+          tooltipInput.value = text;
+          charCount.textContent = text.length + '/15';
+        });
+        textsRow.appendChild(chip);
+      });
+      dd.appendChild(textsRow);
+    }
+
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'profile-dropdown__input-wrap';
+
+    const tooltipInput = document.createElement('input');
+    tooltipInput.type = 'text';
+    tooltipInput.className = 'profile-dropdown__input';
+    tooltipInput.value = profile.tooltipText || '';
+    tooltipInput.placeholder = 'e.g. In meetings...';
+    tooltipInput.maxLength = 15;
+    inputWrap.appendChild(tooltipInput);
+
+    const charCount = document.createElement('span');
+    charCount.className = 'profile-dropdown__charcount';
+    charCount.textContent = (profile.tooltipText || '').length + '/15';
+    inputWrap.appendChild(charCount);
+
+    tooltipInput.addEventListener('input', () => {
+      charCount.textContent = tooltipInput.value.length + '/15';
+    });
+    tooltipInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') saveBtn.click();
+      if (e.key === 'Escape') _closeProfileDropdown();
+    });
+    dd.appendChild(inputWrap);
+
+    // Save button
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'profile-dropdown__save';
+    saveBtn.textContent = 'Save Profile';
+    saveBtn.addEventListener('click', () => {
+      const newProfile = {
+        statusIcon: _selectedIcon,
+        tooltipText: tooltipInput.value.trim().slice(0, 15)
+      };
+      DataLayer.saveUserProfile(newProfile);
+      updateProfileButtonFace();
+      _closeProfileDropdown();
+      render();
+    });
+    dd.appendChild(saveBtn);
+
+    document.body.appendChild(dd);
+    _profileDropdown = dd;
+
+    // Animate in
+    requestAnimationFrame(() => dd.classList.add('visible'));
+
+    // Click outside to close
+    setTimeout(() => {
+      document.addEventListener('mousedown', function _outsideProfileClick(e) {
+        if (dd.contains(e.target) || e.target === anchorBtn) return;
+        document.removeEventListener('mousedown', _outsideProfileClick);
+        _closeProfileDropdown();
+      });
+    }, 0);
+  }
+
+  function _closeProfileDropdown() {
+    if (_profileDropdown) {
+      _profileDropdown.remove();
+      _profileDropdown = null;
+    }
   }
 
   // ── Render All ──
@@ -168,7 +407,7 @@ const App = (() => {
       // Card-level tooltip for compact mode (stats summary)
       const stats = pod.stats || {};
       card.title = pod.fullName
-        + '\nTeam: ' + (stats.teamSize || '?')
+        + '\nResources: ' + (stats.teamSize || '?')
         + '  |  Resp SLA: ' + (stats.responseSLA || '?') + '%'
         + '  |  Res SLA: ' + (stats.resolutionSLA || '?') + '%'
         + '\nBreaches: ' + (stats.totalBreaches || 0)
@@ -180,17 +419,24 @@ const App = (() => {
       if (customIcon) {
         const bgIcon = document.createElement('div');
         bgIcon.className = 'pod-card__bg-icon';
-        // If it looks like a URL, render as tinted image; otherwise as emoji text
         if (customIcon.startsWith('http') || customIcon.startsWith('/') || customIcon.startsWith('data:')) {
           const img = document.createElement('img');
           img.src = customIcon;
           img.alt = '';
           bgIcon.appendChild(img);
         } else {
-          bgIcon.textContent = customIcon;
+          // Render emoji to canvas → monochromatic tint with pod color
+          _tintEmoji(customIcon, color).then(dataUrl => {
+            if (dataUrl) {
+              const img = document.createElement('img');
+              img.src = dataUrl;
+              img.alt = '';
+              bgIcon.appendChild(img);
+            } else {
+              bgIcon.textContent = customIcon;
+            }
+          });
         }
-        // Apply monochromatic pod-color tint
-        bgIcon.style.color = color;
         card.appendChild(bgIcon);
       }
 
@@ -202,11 +448,6 @@ const App = (() => {
       name.className = 'pod-card__name';
       name.textContent = pod.shortName;
       header.appendChild(name);
-
-      const teamSize = document.createElement('span');
-      teamSize.className = 'pod-card__team-size';
-      teamSize.textContent = pod.stats?.teamSize ?? '?';
-      header.appendChild(teamSize);
 
       card.appendChild(header);
 
@@ -573,7 +814,305 @@ const App = (() => {
     }
 
     wrap.appendChild(content);
+
+    // Edit button (hover-visible)
+    const editBtn = document.createElement('button');
+    editBtn.className = 'spotlight__edit';
+    editBtn.title = 'Edit Team Member of the Week';
+    editBtn.textContent = '\u270F\uFE0F';
+    editBtn.addEventListener('click', (e) => { e.stopPropagation(); openSpotlightEditor(); });
+    wrap.appendChild(editBtn);
+
     area.appendChild(wrap);
+  }
+
+  // ── Spotlight Editor Modal ──
+
+  let _spotlightModal = null;
+
+  function openSpotlightEditor() {
+    if (_spotlightModal) { _closeSpotlightModal(); return; }
+
+    const spotlight = DataLayer.getSpotlight() || {};
+    const members = DataLayer.getTeamMembers();
+    const pods = DataLayer.getPods();
+
+    // State
+    let selName = spotlight.name || '';
+    let selPod = spotlight.pod || '';
+    let selAvatar = spotlight.avatar || '';
+    let selMessage = spotlight.message || '';
+    let customUrl = '';
+
+    // Overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'bulletin-modal-overlay';
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) _closeSpotlightModal(); });
+
+    // Panel
+    const panel = document.createElement('div');
+    panel.className = 'bulletin-modal';
+    panel.style.maxWidth = '380px';
+
+    const heading = document.createElement('div');
+    heading.className = 'bulletin-modal__heading';
+    heading.textContent = 'Edit Team Member of the Week';
+    panel.appendChild(heading);
+
+    // Avatar preview
+    const avatarRow = document.createElement('div');
+    avatarRow.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:10px;';
+    const avatarImg = document.createElement('img');
+    avatarImg.style.cssText = 'width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border);background:var(--bg);';
+    avatarImg.src = selAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
+    const avatarInfo = document.createElement('div');
+    avatarInfo.style.cssText = 'flex:1;min-width:0;';
+    avatarRow.appendChild(avatarImg);
+    avatarRow.appendChild(avatarInfo);
+    panel.appendChild(avatarRow);
+
+    // Team member dropdown
+    const memberLabel = document.createElement('label');
+    memberLabel.className = 'spotlight-modal__label';
+    memberLabel.textContent = 'Team Member';
+    avatarInfo.appendChild(memberLabel);
+
+    const memberSelect = document.createElement('select');
+    memberSelect.className = 'bulletin-add-form__input';
+    memberSelect.style.width = '100%';
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = '— Select a team member —';
+    memberSelect.appendChild(defaultOpt);
+
+    members.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      opt.textContent = m.name + (m.pod ? ' (' + m.pod + ')' : '');
+      if (m.name === selName) opt.selected = true;
+      memberSelect.appendChild(opt);
+    });
+
+    memberSelect.addEventListener('change', () => {
+      const m = members.find(x => x.name === memberSelect.value);
+      if (m) {
+        selName = m.name;
+        selPod = m.pod || '';
+        podSelect.value = selPod;
+        if (!useCustomUrl) {
+          selAvatar = dicebearUrl(activeStyle, m.name);
+          avatarImg.src = selAvatar;
+        }
+        // Refresh avatar style grid with new name seed
+        if (typeof refreshStyleGrid === 'function') refreshStyleGrid();
+      }
+    });
+    avatarInfo.appendChild(memberSelect);
+
+    // Pod dropdown
+    const podLabel = document.createElement('label');
+    podLabel.className = 'spotlight-modal__label';
+    podLabel.textContent = 'Pod';
+    panel.appendChild(podLabel);
+
+    const podSelect = document.createElement('select');
+    podSelect.className = 'bulletin-add-form__input';
+    podSelect.style.width = '100%';
+
+    // Collect all unique groups from team members + pods
+    const podNames = pods.map(p => p.shortName);
+    const extraGroups = [...new Set(members.map(m => m.pod).filter(g => g && !podNames.includes(g)))];
+
+    pods.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.shortName;
+      opt.textContent = p.shortName + ' — ' + p.fullName;
+      if (p.shortName === selPod) opt.selected = true;
+      podSelect.appendChild(opt);
+    });
+    extraGroups.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      if (g === selPod) opt.selected = true;
+      podSelect.appendChild(opt);
+    });
+    podSelect.addEventListener('change', () => { selPod = podSelect.value; });
+    panel.appendChild(podSelect);
+
+    // ── Photo Source Picker ──
+    const photoLabel = document.createElement('label');
+    photoLabel.className = 'spotlight-modal__label';
+    photoLabel.textContent = 'Photo';
+    panel.appendChild(photoLabel);
+
+    // Avatar style options
+    const AVATAR_STYLES = [
+      { id: 'avataaars', label: 'Avataaars' },
+      { id: 'bottts', label: 'Bots' },
+      { id: 'lorelei', label: 'Lorelei' },
+      { id: 'notionists', label: 'Notionists' },
+      { id: 'thumbs', label: 'Thumbs' },
+      { id: 'fun-emoji', label: 'Emoji' },
+      { id: 'pixel-art', label: 'Pixel' },
+      { id: 'adventurer', label: 'Adventure' }
+    ];
+
+    function dicebearUrl(style, name) {
+      const seed = encodeURIComponent((name || 'default').replace(/\s+/g, ''));
+      return 'https://api.dicebear.com/7.x/' + style + '/svg?seed=' + seed;
+    }
+
+    // Detect current style from existing avatar URL
+    let activeStyle = 'avataaars';
+    let useCustomUrl = false;
+    if (selAvatar) {
+      const styleMatch = selAvatar.match(/dicebear\.com\/7\.x\/([^/]+)\//);
+      if (styleMatch) {
+        activeStyle = styleMatch[1];
+      } else if (!selAvatar.includes('dicebear.com')) {
+        useCustomUrl = true;
+        customUrl = selAvatar;
+      }
+    }
+
+    // Style grid — clickable avatar previews
+    const styleGrid = document.createElement('div');
+    styleGrid.className = 'spotlight-avatar-grid';
+
+    function refreshStyleGrid() {
+      styleGrid.textContent = '';
+      AVATAR_STYLES.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'spotlight-avatar-option' + (!useCustomUrl && s.id === activeStyle ? ' spotlight-avatar-option--active' : '');
+        btn.title = s.label;
+        const img = document.createElement('img');
+        img.src = dicebearUrl(s.id, selName);
+        img.alt = s.label;
+        img.style.cssText = 'width:100%;height:100%;border-radius:50%;';
+        btn.appendChild(img);
+        btn.addEventListener('click', () => {
+          activeStyle = s.id;
+          useCustomUrl = false;
+          selAvatar = dicebearUrl(s.id, selName);
+          avatarImg.src = selAvatar;
+          urlInput.value = '';
+          customUrl = '';
+          refreshStyleGrid();
+        });
+        styleGrid.appendChild(btn);
+      });
+
+      // "URL" option as last item
+      const urlBtn = document.createElement('button');
+      urlBtn.className = 'spotlight-avatar-option spotlight-avatar-option--url' + (useCustomUrl ? ' spotlight-avatar-option--active' : '');
+      urlBtn.title = 'External image URL';
+      urlBtn.textContent = '🔗';
+      urlBtn.addEventListener('click', () => {
+        useCustomUrl = true;
+        refreshStyleGrid();
+        urlInput.style.display = '';
+        urlInput.focus();
+      });
+      styleGrid.appendChild(urlBtn);
+    }
+
+    refreshStyleGrid();
+    panel.appendChild(styleGrid);
+
+    // External URL input (hidden unless "URL" mode is active)
+    const urlInput = document.createElement('input');
+    urlInput.type = 'text';
+    urlInput.className = 'bulletin-add-form__input';
+    urlInput.placeholder = 'https://example.com/photo.jpg';
+    urlInput.value = customUrl;
+    urlInput.style.display = useCustomUrl ? '' : 'none';
+    urlInput.style.marginTop = '6px';
+    urlInput.addEventListener('input', () => {
+      customUrl = urlInput.value.trim();
+      if (customUrl) {
+        useCustomUrl = true;
+        selAvatar = customUrl;
+        avatarImg.src = customUrl;
+        refreshStyleGrid();
+      } else {
+        useCustomUrl = false;
+        selAvatar = dicebearUrl(activeStyle, selName);
+        avatarImg.src = selAvatar;
+        refreshStyleGrid();
+      }
+    });
+    panel.appendChild(urlInput);
+
+    // Achievement message
+    const msgLabel = document.createElement('label');
+    msgLabel.className = 'spotlight-modal__label';
+    msgLabel.textContent = 'Achievement';
+    panel.appendChild(msgLabel);
+
+    const msgInput = document.createElement('textarea');
+    msgInput.className = 'bulletin-add-form__textarea';
+    msgInput.placeholder = 'What did they accomplish?';
+    msgInput.rows = 3;
+    msgInput.maxLength = 200;
+    msgInput.value = selMessage;
+    msgInput.addEventListener('input', () => { selMessage = msgInput.value; });
+    panel.appendChild(msgInput);
+
+    // Character count
+    const charCount = document.createElement('div');
+    charCount.style.cssText = 'font-size:10px;color:var(--text-muted);text-align:right;margin-top:-4px;';
+    charCount.textContent = selMessage.length + '/200';
+    msgInput.addEventListener('input', () => { charCount.textContent = msgInput.value.length + '/200'; });
+    panel.appendChild(charCount);
+
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'bulletin-add-form__actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'bulletin-add-form__post';
+    saveBtn.textContent = 'Save';
+    saveBtn.addEventListener('click', () => {
+      if (!selName) { memberSelect.style.borderColor = '#EF4444'; return; }
+      DataLayer.saveSpotlight({
+        type: 'teamMember',
+        title: 'Team Member of the Week',
+        name: selName,
+        pod: selPod,
+        avatar: selAvatar,
+        message: selMessage
+      });
+      _closeSpotlightModal();
+      renderSpotlight();
+    });
+    actions.appendChild(saveBtn);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'bulletin-add-form__cancel';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', _closeSpotlightModal);
+    actions.appendChild(cancelBtn);
+
+    panel.appendChild(actions);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    _spotlightModal = overlay;
+
+    // Escape key
+    _spotlightModal._onKey = (e) => { if (e.key === 'Escape') _closeSpotlightModal(); };
+    document.addEventListener('keydown', _spotlightModal._onKey);
+
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+  }
+
+  function _closeSpotlightModal() {
+    if (_spotlightModal) {
+      document.removeEventListener('keydown', _spotlightModal._onKey);
+      _spotlightModal.remove();
+      _spotlightModal = null;
+    }
   }
 
   // ── On-Call ──
@@ -590,11 +1129,14 @@ const App = (() => {
 
     bar.style.display = '';
 
-    // On-call icon
+    // ── Row 1: primary on-call ──
+    const row1 = document.createElement('div');
+    row1.className = 'on-call-bar__row';
+
     const icon = document.createElement('span');
     icon.className = 'on-call-bar__icon';
     icon.textContent = '\uD83D\uDCDF'; // 📟 pager
-    bar.appendChild(icon);
+    row1.appendChild(icon);
 
     const label = document.createElement('span');
     label.className = 'on-call-bar__label';
@@ -603,7 +1145,7 @@ const App = (() => {
     link.target = '_blank';
     link.textContent = 'On-Call Team Member:';
     label.appendChild(link);
-    bar.appendChild(label);
+    row1.appendChild(label);
 
     // Incident status emoji (after label, before name)
     const statusEmoji = document.createElement('span');
@@ -611,7 +1153,7 @@ const App = (() => {
     statusEmoji.style.marginLeft = 'auto';
     statusEmoji.textContent = onCall.inIncident ? '\uD83D\uDE1F' : '\uD83D\uDE0A'; // 😟 or 😊
     statusEmoji.title = onCall.inIncident ? 'In Incident' : 'Idle \u2014 No Active Incidents';
-    bar.appendChild(statusEmoji);
+    row1.appendChild(statusEmoji);
 
     const name = document.createElement('span');
     name.className = 'on-call-bar__name';
@@ -626,7 +1168,44 @@ const App = (() => {
       bar.style.borderLeft = '3px solid #EF4444';
     }
 
-    bar.appendChild(name);
+    row1.appendChild(name);
+    bar.appendChild(row1);
+
+    // ── Row 2: night shift / after-hours on-call ──
+    const afterHours = onCall.afterHours;
+    if (afterHours && afterHours.name) {
+      const row2 = document.createElement('div');
+      row2.className = 'on-call-bar__row';
+
+      const nightIcon = document.createElement('span');
+      nightIcon.className = 'on-call-bar__icon';
+      nightIcon.textContent = '\uD83C\uDF19'; // 🌙
+      row2.appendChild(nightIcon);
+
+      const nightLabel = document.createElement('span');
+      nightLabel.className = 'on-call-bar__label';
+      if (afterHours.calendarUrl) {
+        const nightLink = document.createElement('a');
+        nightLink.href = afterHours.calendarUrl;
+        nightLink.target = '_blank';
+        nightLink.textContent = 'Night Shift:';
+        nightLabel.appendChild(nightLink);
+      } else {
+        nightLabel.textContent = 'Night Shift:';
+      }
+      row2.appendChild(nightLabel);
+
+      const nightName = document.createElement('span');
+      nightName.className = 'on-call-bar__name';
+      nightName.style.marginLeft = 'auto';
+      const nightParts = afterHours.name.split(' ');
+      nightName.textContent = nightParts.length > 1
+        ? nightParts[0] + ' ' + nightParts[nightParts.length - 1][0] + '.'
+        : afterHours.name;
+      row2.appendChild(nightName);
+
+      bar.appendChild(row2);
+    }
   }
 
   // ── Team Status ──
@@ -716,7 +1295,11 @@ const App = (() => {
       } else {
         name.style.color = (podColorMap && podColorMap[m.pod]) || 'var(--text-primary)';
       }
-      name.textContent = m.name;
+      // Abbreviate: "Eric Morin" → "Eric M."
+      const nameParts = m.name.split(' ');
+      name.textContent = nameParts.length > 1
+        ? nameParts[0] + ' ' + nameParts[nameParts.length - 1][0] + '.'
+        : m.name;
       row.appendChild(name);
 
       // Status emoji inline (no text)
@@ -725,6 +1308,19 @@ const App = (() => {
         emoji.className = 'member-emoji';
         emoji.textContent = m.statusEmoji;
         row.appendChild(emoji);
+      }
+
+      // Profile icon — show if this member has a saved profile icon
+      const currentUser = DataLayer.getUser();
+      if (currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+        const profile = DataLayer.getUserProfile();
+        if (profile.statusIcon) {
+          const profIcon = document.createElement('span');
+          profIcon.className = 'member-profile-icon';
+          profIcon.textContent = profile.statusIcon;
+          if (profile.tooltipText) profIcon.title = profile.tooltipText;
+          row.appendChild(profIcon);
+        }
       }
 
       // Hover tooltip with title & status
@@ -766,6 +1362,18 @@ const App = (() => {
       titleDiv.style.cssText = 'font-size:10px;color:var(--text-muted);margin-bottom:2px;';
       titleDiv.textContent = member.title;
       tip.appendChild(titleDiv);
+    }
+
+    // Show user's custom profile tooltip if this is the matching user
+    const currentUser = DataLayer.getUser();
+    if (currentUser && member.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+      const profile = DataLayer.getUserProfile();
+      if (profile.statusIcon || profile.tooltipText) {
+        const profDiv = document.createElement('div');
+        profDiv.style.cssText = 'font-size:11px;color:#93C5FD;margin-top:2px;';
+        profDiv.textContent = (profile.statusIcon ? profile.statusIcon + ' ' : '') + (profile.tooltipText || '');
+        tip.appendChild(profDiv);
+      }
     }
 
     if (member.statusEmoji || member.statusMessage) {
@@ -836,6 +1444,58 @@ const App = (() => {
         el.style.display = Settings.isSectionVisible(key) ? '' : 'none';
       }
     });
+  }
+
+  // ── Emoji Tinting (canvas-based monochrome) ──
+
+  const _tintCache = {};
+
+  /**
+   * Renders an emoji onto a canvas and replaces all pixel colors with `hexColor`,
+   * preserving the original alpha channel. Returns a data-URL for use as an <img>.
+   */
+  async function _tintEmoji(emoji, hexColor, size) {
+    size = size || 128;
+    const key = emoji + '|' + hexColor;
+    if (_tintCache[key]) return _tintCache[key];
+
+    // Parse hex → RGB
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Draw emoji centered
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = (size * 0.75) + 'px serif';
+      ctx.fillText(emoji, size / 2, size / 2);
+
+      // Replace RGB with pod color, preserve alpha
+      const imageData = ctx.getImageData(0, 0, size, size);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] > 0) {        // has some opacity
+          d[i]     = r;             // R
+          d[i + 1] = g;             // G
+          d[i + 2] = b;             // B
+          // alpha stays as-is
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      _tintCache[key] = dataUrl;
+      return dataUrl;
+    } catch (e) {
+      return null;  // fallback to plain emoji text
+    }
   }
 
   // ── Sparkline SVG Builder ──

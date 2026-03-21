@@ -209,6 +209,9 @@ const Settings = (() => {
 
     body.appendChild(bannerSection);
 
+    // ── Team Member of the Week ──
+    _renderSpotlightEditor(body);
+
     // ── Admin Features ──
     if (isAdmin) {
       // Pod Appearance (color + icon)
@@ -271,10 +274,25 @@ const Settings = (() => {
         const picker = document.createElement('div');
         picker.className = 'mini-emoji-picker';
 
-        // Position below the button
+        // Position: prefer below-left of button, clamp to viewport
         const rect = anchorBtn.getBoundingClientRect();
-        picker.style.top = (rect.bottom + 4) + 'px';
-        picker.style.left = rect.left + 'px';
+        const pickerW = 260; // matches CSS width
+        const pickerH = 380; // approx max-height
+
+        // Horizontal: align right edge to button right, fallback left
+        let left = rect.right - pickerW;
+        if (left < 8) left = 8;
+        if (left + pickerW > window.innerWidth - 8) left = window.innerWidth - pickerW - 8;
+
+        // Vertical: prefer below, flip above if no room
+        let top = rect.bottom + 4;
+        if (top + pickerH > window.innerHeight - 8) {
+          top = rect.top - pickerH - 4;
+          if (top < 8) top = 8;
+        }
+
+        picker.style.top = top + 'px';
+        picker.style.left = left + 'px';
 
         // Search input
         const searchInput = document.createElement('input');
@@ -288,35 +306,45 @@ const Settings = (() => {
         grid.className = 'mini-emoji-picker__grid';
         picker.appendChild(grid);
 
-        // Render emojis
+        // Render emojis — same full set as sticker picker
         function renderResults(query) {
           grid.textContent = '';
-          const results = query
-            ? EmojiData.search(query).slice(0, 40)
-            : EmojiData.getAll().slice(0, 40);
-          results.forEach(item => {
-            const btn = document.createElement('button');
-            btn.className = 'mini-emoji-picker__item';
-            btn.textContent = item.emoji;
-            btn.title = item.name || '';
-            if (item.emoji === currentIcon) btn.classList.add('mini-emoji-picker__item--active');
-            btn.addEventListener('click', () => {
-              // Save to pod settings
-              const ps = DataLayer.getPodSettings ? DataLayer.getPodSettings(podName) : {};
-              ps.bgIcon = item.emoji;
-              if (DataLayer.savePodSettings) DataLayer.savePodSettings(podName, ps);
-              anchorBtn.textContent = item.emoji;
-              if (_miniPicker) { _miniPicker.remove(); _miniPicker = null; }
-              if (typeof App !== 'undefined') App.render();
-            });
-            grid.appendChild(btn);
-          });
+          if (!query) {
+            // Default: show hint encouraging search (matches sticker picker UX)
+            const hint = document.createElement('div');
+            hint.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:11px;padding:8px;';
+            hint.textContent = 'Search ' + (typeof EmojiData !== 'undefined' ? EmojiData.count() : '500+') + ' emojis...';
+            grid.appendChild(hint);
+            // Also show a curated starter set below the hint
+            const starters = EmojiData.getAll().slice(0, 60);
+            starters.forEach(emoji => _addEmojiBtn(emoji));
+            return;
+          }
+          // EmojiData.search() returns plain emoji strings, not objects
+          const results = EmojiData.search(query, 60);
+          results.forEach(emoji => _addEmojiBtn(emoji));
           if (results.length === 0) {
             const empty = document.createElement('div');
             empty.style.cssText = 'grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:11px;padding:8px;';
             empty.textContent = 'No matches';
             grid.appendChild(empty);
           }
+        }
+
+        function _addEmojiBtn(emoji) {
+          const btn = document.createElement('button');
+          btn.className = 'mini-emoji-picker__item';
+          btn.textContent = emoji;
+          if (emoji === currentIcon) btn.classList.add('mini-emoji-picker__item--active');
+          btn.addEventListener('click', () => {
+            const ps = DataLayer.getPodSettings ? DataLayer.getPodSettings(podName) : {};
+            ps.bgIcon = emoji;
+            if (DataLayer.savePodSettings) DataLayer.savePodSettings(podName, ps);
+            anchorBtn.textContent = emoji;
+            if (_miniPicker) { _miniPicker.remove(); _miniPicker = null; }
+            if (typeof App !== 'undefined') App.render();
+          });
+          grid.appendChild(btn);
         }
 
         renderResults('');
@@ -836,6 +864,224 @@ const Settings = (() => {
     });
     userRow.appendChild(changeBtn);
     body.appendChild(userRow);
+  }
+
+  // ── Team Member of the Week Editor ──
+
+  const DICEBEAR_STYLES = [
+    { id: 'avataaars',  label: 'Cartoon' },
+    { id: 'bottts',     label: 'Robot' },
+    { id: 'lorelei',    label: 'Portrait' },
+    { id: 'notionists', label: 'Notion' },
+    { id: 'thumbs',     label: 'Thumbs' },
+    { id: 'fun-emoji',  label: 'Emoji' },
+  ];
+
+  function _renderSpotlightEditor(body) {
+    const section = createSection('Team Member of the Week');
+    const spotlight = DataLayer.getSpotlight() || {};
+    const pods = DataLayer.getPods();
+
+    // ── Name ──
+    const nameLabel = document.createElement('span');
+    nameLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;';
+    nameLabel.textContent = 'Name';
+    section.appendChild(nameLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = spotlight.name || '';
+    nameInput.placeholder = 'Team member name...';
+    nameInput.style.cssText = 'width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;';
+    section.appendChild(nameInput);
+
+    // ── Pod ──
+    const podLabel = document.createElement('span');
+    podLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin:8px 0 4px;';
+    podLabel.textContent = 'Pod';
+    section.appendChild(podLabel);
+
+    const podSelect = document.createElement('select');
+    podSelect.style.cssText = 'width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 6px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;background:white;';
+    pods.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.shortName;
+      opt.textContent = p.shortName;
+      if (p.shortName === spotlight.pod) opt.selected = true;
+      podSelect.appendChild(opt);
+    });
+    section.appendChild(podSelect);
+
+    // ── Message ──
+    const msgLabel = document.createElement('span');
+    msgLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin:8px 0 4px;';
+    msgLabel.textContent = 'Recognition message';
+    section.appendChild(msgLabel);
+
+    const msgInput = document.createElement('textarea');
+    msgInput.value = spotlight.message || '';
+    msgInput.placeholder = 'Why are they being recognized?';
+    msgInput.style.cssText = 'width:100%;height:60px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;resize:vertical;';
+    section.appendChild(msgInput);
+
+    // ── Photo ──
+    const photoLabel = document.createElement('span');
+    photoLabel.style.cssText = 'font-size:12px;color:var(--text-secondary);display:block;margin:8px 0 4px;';
+    photoLabel.textContent = 'Photo';
+    section.appendChild(photoLabel);
+
+    // Photo mode: "auto" (DiceBear) or "url" (custom)
+    const currentAvatar = spotlight.avatar || '';
+    const isCustomUrl = currentAvatar && !currentAvatar.includes('dicebear.com');
+    let photoMode = isCustomUrl ? 'url' : 'auto';
+
+    // Detect current DiceBear style from URL
+    let currentStyle = 'avataaars';
+    if (!isCustomUrl && currentAvatar) {
+      const styleMatch = currentAvatar.match(/dicebear\.com\/7\.x\/([^/]+)\//);
+      if (styleMatch) currentStyle = styleMatch[1];
+    }
+
+    // Photo mode tabs
+    const tabRow = document.createElement('div');
+    tabRow.style.cssText = 'display:flex;gap:4px;margin-bottom:8px;';
+
+    const autoTab = document.createElement('button');
+    autoTab.textContent = 'Auto Avatar';
+    autoTab.className = 'settings-btn';
+    autoTab.style.cssText = 'flex:1;padding:4px 8px;font-size:11px;font-weight:600;';
+
+    const urlTab = document.createElement('button');
+    urlTab.textContent = 'Custom URL';
+    urlTab.className = 'settings-btn';
+    urlTab.style.cssText = 'flex:1;padding:4px 8px;font-size:11px;font-weight:600;';
+
+    tabRow.appendChild(autoTab);
+    tabRow.appendChild(urlTab);
+    section.appendChild(tabRow);
+
+    // Auto avatar area
+    const autoArea = document.createElement('div');
+
+    // Style picker row
+    const styleRow = document.createElement('div');
+    styleRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;';
+
+    DICEBEAR_STYLES.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'settings-btn spotlight-style-btn';
+      btn.dataset.style = s.id;
+      btn.textContent = s.label;
+      btn.style.cssText = 'padding:3px 8px;font-size:10px;border-radius:12px;';
+      if (s.id === currentStyle && photoMode === 'auto') {
+        btn.style.background = '#3B82F6';
+        btn.style.color = 'white';
+      }
+      btn.addEventListener('click', () => {
+        currentStyle = s.id;
+        // Update active state
+        styleRow.querySelectorAll('.spotlight-style-btn').forEach(b => {
+          b.style.background = '';
+          b.style.color = '';
+        });
+        btn.style.background = '#3B82F6';
+        btn.style.color = 'white';
+        updatePreview();
+      });
+      styleRow.appendChild(btn);
+    });
+    autoArea.appendChild(styleRow);
+    section.appendChild(autoArea);
+
+    // Custom URL area
+    const urlArea = document.createElement('div');
+    const urlInput = document.createElement('input');
+    urlInput.type = 'url';
+    urlInput.value = isCustomUrl ? currentAvatar : '';
+    urlInput.placeholder = 'https://example.com/photo.jpg';
+    urlInput.style.cssText = 'width:100%;height:32px;border:1px solid var(--border);border-radius:6px;padding:0 8px;font-size:12px;font-family:var(--font);outline:none;box-sizing:border-box;';
+    urlInput.addEventListener('input', updatePreview);
+    urlArea.appendChild(urlInput);
+    section.appendChild(urlArea);
+
+    // Preview
+    const previewRow = document.createElement('div');
+    previewRow.style.cssText = 'display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px;background:#F8FAFC;border-radius:8px;';
+
+    const previewImg = document.createElement('img');
+    previewImg.style.cssText = 'width:48px;height:48px;border-radius:50%;border:2px solid var(--border);object-fit:cover;';
+    previewRow.appendChild(previewImg);
+
+    const previewText = document.createElement('div');
+    previewText.style.cssText = 'font-size:11px;color:var(--text-secondary);';
+    previewText.textContent = 'Preview';
+    previewRow.appendChild(previewText);
+
+    section.appendChild(previewRow);
+
+    // Tab switching logic
+    function setTab(mode) {
+      photoMode = mode;
+      autoArea.style.display = mode === 'auto' ? '' : 'none';
+      urlArea.style.display = mode === 'url' ? '' : 'none';
+      autoTab.style.background = mode === 'auto' ? '#3B82F6' : '';
+      autoTab.style.color = mode === 'auto' ? 'white' : '';
+      urlTab.style.background = mode === 'url' ? '#3B82F6' : '';
+      urlTab.style.color = mode === 'url' ? 'white' : '';
+      updatePreview();
+    }
+    autoTab.addEventListener('click', () => setTab('auto'));
+    urlTab.addEventListener('click', () => setTab('url'));
+
+    function updatePreview() {
+      let src;
+      if (photoMode === 'url' && urlInput.value.trim()) {
+        src = urlInput.value.trim();
+      } else {
+        const seed = (nameInput.value.trim() || 'TeamMember').replace(/\s+/g, '');
+        src = 'https://api.dicebear.com/7.x/' + currentStyle + '/svg?seed=' + encodeURIComponent(seed);
+      }
+      previewImg.src = src;
+      previewImg.onerror = () => { previewImg.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'; };
+    }
+
+    // Update preview when name changes (affects DiceBear seed)
+    nameInput.addEventListener('input', () => { if (photoMode === 'auto') updatePreview(); });
+
+    // Initialize
+    setTab(photoMode);
+
+    // ── Save button ──
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'settings-btn';
+    saveBtn.textContent = 'Update Spotlight';
+    saveBtn.style.cssText = 'margin-top:10px;padding:6px 16px;font-weight:600;width:100%;';
+    saveBtn.addEventListener('click', () => {
+      let avatar;
+      if (photoMode === 'url' && urlInput.value.trim()) {
+        avatar = urlInput.value.trim();
+      } else {
+        const seed = (nameInput.value.trim() || 'TeamMember').replace(/\s+/g, '');
+        avatar = 'https://api.dicebear.com/7.x/' + currentStyle + '/svg?seed=' + encodeURIComponent(seed);
+      }
+
+      DataLayer.saveSpotlight({
+        type: 'teamMember',
+        title: 'Team Member of the Week',
+        name: nameInput.value.trim(),
+        pod: podSelect.value,
+        avatar: avatar,
+        message: msgInput.value.trim()
+      });
+
+      if (typeof App !== 'undefined') App.render();
+
+      saveBtn.textContent = 'Saved!';
+      setTimeout(() => { saveBtn.textContent = 'Update Spotlight'; }, 1200);
+    });
+    section.appendChild(saveBtn);
+
+    body.appendChild(section);
   }
 
   // ── DOM Helpers ──
