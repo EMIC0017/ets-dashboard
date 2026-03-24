@@ -123,7 +123,7 @@ const PODS = [
 const AUTH = Buffer.from(`${JIRA_EMAIL}:${JIRA_TOKEN}`).toString('base64');
 
 async function jiraSearch(jql, fields = 'summary,status,priority,created,resolutiondate', maxResults = 500) {
-  const url = `${JIRA_BASE}/rest/api/3/search/jql`;
+  const url = `${JIRA_BASE}/rest/api/3/search`;
   let startAt = 0;
   let all = [];
 
