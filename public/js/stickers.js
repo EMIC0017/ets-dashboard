@@ -209,6 +209,8 @@ const Stickers = (() => {
   // ── Render Stickers ──
 
   function renderStickers() {
+    // Don't re-render while dragging — would destroy the element being moved
+    if (_dragState) return;
     // Remove existing bubbles
     document.querySelectorAll('.sticker-bubble').forEach(el => el.remove());
 

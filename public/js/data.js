@@ -37,6 +37,19 @@ const DataLayer = (() => {
 
   // ── Load ─────────────────────────────────────────────────────────────────
 
+  // Fetch pre-built Jira metrics from GitHub Actions output.
+  // Returns an object keyed by pod id, or {} if unavailable.
+  async function _fetchJiraMetrics() {
+    try {
+      const res = await fetch('/data/metrics.json?_=' + Date.now());
+      if (!res.ok) return {};
+      const json = await res.json();
+      return (json && json.pods) ? json.pods : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
   async function load() {
     try {
       const [
@@ -50,6 +63,7 @@ const DataLayer = (() => {
         { data: meetings,      error: e8 },
         { data: onCallRows,    error: e9 },
         { data: stickers,      error: e10 },
+        jiraMetrics,
       ] = await Promise.all([
         sb.from('pods').select('*').order('id'),
         sb.from('pod_metrics').select('*').order('week_start'),
@@ -61,6 +75,7 @@ const DataLayer = (() => {
         sb.from('meetings').select('*').order('start_time'),
         sb.from('on_call').select('*').limit(1),
         sb.from('stickers').select('*').is('pod_id', null),
+        _fetchJiraMetrics(),
       ]);
 
       for (const [label, err] of [['pods',e1],['metrics',e2],['members',e3],['bulletin',e4],
@@ -93,14 +108,27 @@ const DataLayer = (() => {
       const onCall = onCallRows?.[0];
 
       _config = {
-        pods: (pods || []).map(p => ({
-          id:        p.id,
-          shortName: p.short_name,
-          fullName:  p.full_name,
-          icon:      p.icon,
-          color:     p.color,
-          stats:     _buildPodStats(metricsById[p.id]),
-        })),
+        pods: (pods || []).map(p => {
+          const supabaseStats = _buildPodStats(metricsById[p.id]);
+          const jira = jiraMetrics[p.id];
+          // Jira data wins when available and has no error; Supabase is the fallback
+          const stats = (jira && !jira.error)
+            ? {
+                weeklyIncoming:   jira.weeklyIncoming   || supabaseStats.weeklyIncoming,
+                weeklyThroughput: jira.weeklyThroughput || supabaseStats.weeklyThroughput,
+                weeklyAHT:        jira.weeklyAHT        || supabaseStats.weeklyAHT,
+                responseSLA:      jira.responseSLA      ?? supabaseStats.responseSLA,
+                resolutionSLA:    jira.resolutionSLA    ?? supabaseStats.resolutionSLA,
+                totalBreaches:    jira.totalBreaches    ?? supabaseStats.totalBreaches,
+                totalEscalations: jira.totalEscalations ?? supabaseStats.totalEscalations,
+                weeks:            jira.weeks            || supabaseStats.weeks,
+                openCount:        jira.openCount,
+                jiraFetchedAt:    jira.fetchedAt,
+              }
+            : supabaseStats;
+          return { id: p.id, shortName: p.short_name, fullName: p.full_name,
+                   icon: p.icon, color: p.color, stats };
+        }),
 
         teamMembers,
 

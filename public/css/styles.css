@@ -101,18 +101,18 @@ html, body {
 /* ── Header ── */
 .header {
   text-align: center;
-  padding: 12px 24px 8px;
+  padding: clamp(5px, 1vh, 12px) 24px clamp(3px, 0.6vh, 8px);
   position: relative;
   flex-shrink: 0;
 }
 .header__title {
-  font-size: 28px;
+  font-size: clamp(18px, 3.2vw, 28px);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
 }
 .header__subtitle {
-  font-size: 12px;
+  font-size: clamp(10px, 1.4vw, 12px);
   color: var(--text-muted);
   margin-top: 2px;
 }
@@ -315,8 +315,8 @@ html, body {
 .main {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 16px;
-  padding: 8px 24px;
+  gap: clamp(6px, 1.2vw, 16px);
+  padding: clamp(4px, 0.8vh, 8px) clamp(8px, 1.8vw, 24px);
   flex: 1;
   min-height: 0; /* critical for grid children to respect overflow */
 }
@@ -326,8 +326,7 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  width: 260px;
-  max-width: 260px;
+  width: clamp(180px, 28vw, 300px);
   flex-shrink: 0;
 }
 .pods-week {
@@ -342,20 +341,17 @@ html, body {
 .pods-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: clamp(4px, 0.6vw, 8px);
   min-height: 0;
   flex: 1;
-}
-.pods-grid .pod-card {
-  aspect-ratio: 1 / 1;
 }
 
 /* ── Pod Tile Card ── */
 .pod-card {
   background: var(--card-bg);
   border-radius: var(--radius);
-  padding: 14px 14px 8px;
+  padding: clamp(6px, 1vw, 14px) clamp(6px, 1vw, 14px) clamp(4px, 0.6vw, 8px);
   box-shadow: var(--shadow-sm);
   border-left: 4px solid var(--pod-color, #94A3B8);
   cursor: pointer;
@@ -398,7 +394,7 @@ html, body {
   gap: 6px;
 }
 .pod-card__name {
-  font-size: 18px;
+  font-size: clamp(13px, 1.8vw, 18px);
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -947,8 +943,7 @@ html, body {
   flex-direction: column;
   gap: 10px;
   min-height: 0;
-  width: 280px;
-  max-width: 280px;
+  width: clamp(160px, 24vw, 280px);
   flex-shrink: 0;
 }
 
@@ -1522,6 +1517,7 @@ html, body {
   padding: 4px;
 }
 .settings-panel__body {
+  scrollbar-gutter: stable;
   padding: 16px 20px;
   overflow-y: auto;
   flex: 1;
@@ -1914,22 +1910,58 @@ body.placing-sticker { cursor: crosshair; }
   }
 }
 
-@media (max-width: 650px) {
-  /* Stack everything vertically on very narrow */
-  .main {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+@media (max-width: 620px) {
+  /* Narrow: drop right column, keep pods + center */
+  .right-col {
+    display: none;
   }
 
+  .main {
+    grid-template-columns: auto 1fr;
+    gap: 8px;
+    padding: 4px 8px;
+  }
+
+  /* Give pods more breathing room now that right col is gone */
   .pods-col {
+    width: clamp(140px, 32vw, 220px);
     min-width: unset;
     max-width: unset;
   }
 
-  /* Pod grid becomes horizontal row */
+  /* Restore 2×3 grid with compact cards */
   .pods-grid {
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+  }
+
+  /* Compact pod cards */
+  .pod-card {
+    padding: 5px 6px 3px;
+    border-radius: 8px;
+    border-left-width: 3px;
+    min-height: 0;
+    max-width: unset;
+    min-width: 0;
+  }
+
+  .pod-card__name {
+    font-size: clamp(11px, 2.5vw, 14px);
+  }
+
+  /* Tighten header */
+  .header {
+    padding: 4px 16px 3px;
+  }
+
+  .header__title {
+    font-size: clamp(16px, 4vw, 22px);
+  }
+
+  .banner {
+    padding: 5px 36px;
+    font-size: 11px;
   }
 }
 
@@ -1943,4 +1975,22 @@ body.placing-sticker { cursor: crosshair; }
   overflow: hidden;
   clip: rect(0,0,0,0);
   border: 0;
+}
+
+/* ── Settings panel scrollbar (always visible) ── */
+.settings-panel__body {
+  overflow-y: scroll;
+}
+.settings-panel__body::-webkit-scrollbar {
+  width: 6px;
+}
+.settings-panel__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.settings-panel__body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.settings-panel__body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
