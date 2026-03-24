@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-03-24T14:47:33.814Z",
+  "generatedAt": "2026-03-24T15:55:15.858Z",
   "pods": {
     "ads": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     },
     "caper": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     },
     "cat": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     },
     "faas": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     },
     "fs": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     },
     "wl": {
-      "error": "Jira API 400: {\"errorMessages\":[\"Invalid request payload. Refer to the REST API documentation and try again.\"]}"
+      "error": "Jira API 410: {\"errorMessages\":[\"The requested API has been removed. Please migrate to the /rest/api/3/search/jql API. A full migration guideline is available at https://developer.atlassian.com/changelog/#CHANGE-2046\"],\"errors\":{}}"
     }
   }
 }
