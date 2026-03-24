@@ -51,6 +51,7 @@ const DataLayer = (() => {
   }
 
   async function load() {
+    const prevStickers = _config?.stickers || [];
     try {
       const [
         { data: pods,          error: e1 },
@@ -204,6 +205,13 @@ const DataLayer = (() => {
           podChannels: { Ads: 'C073V4FR1DE', Cat: '', Caper: 'C05L86U993N', FaaS: 'C060VQ316KT', FS: 'C077P6VE9EE', WL: 'C073676HT5H' },
         },
       };
+
+      // Preserve optimistic stickers: locally-added ones not yet confirmed in Supabase.
+      // Without this, the 15s refresh overwrites _config.stickers before the async
+      // Supabase write lands, causing stickers to vanish on the next render().
+      const freshIds = new Set(_config.stickers.map(s => s.id));
+      const pending  = prevStickers.filter(s => !freshIds.has(s.id));
+      if (pending.length > 0) _config.stickers = [..._config.stickers, ...pending];
 
       return _config;
     } catch (err) {
