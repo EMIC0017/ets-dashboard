@@ -185,14 +185,15 @@ const DataLayer = (() => {
         } : null,
 
         stickers: (stickers || []).map(s => ({
-          id:         s.id,
-          content:    s.content,
-          x:          parseFloat(s.x),
-          y:          parseFloat(s.y),
-          color:      s.color,
-          author:     s.author,
-          persistent: s.persistent,
-          expiresAt:  s.expires_at,
+          id:          s.id,
+          icon:        s.content,    // DB column is 'content'; renderStickers() uses 'icon'
+          tooltipText: s.tooltip_text || '',
+          x:           parseFloat(s.x),
+          y:           parseFloat(s.y),
+          color:       s.color,
+          placedBy:    s.author,
+          persistent:  s.persistent,
+          expiresAt:   s.expires_at,
         })),
 
         admins: teamMembers.filter(m => m.role === 'manager').map(m => m.name),
@@ -419,7 +420,7 @@ const DataLayer = (() => {
     saveStickers(stickers);
     if (!_stickerScope) {
       _sb(sb.from('stickers').insert({
-        id: sticker.id, content: sticker.content,
+        id: sticker.id, content: sticker.icon || sticker.content,
         x: sticker.x, y: sticker.y, color: sticker.color,
         author: sticker.author, persistent: sticker.persistent || false,
         expires_at: sticker.expiresAt || null, pod_id: null,
