@@ -1080,6 +1080,18 @@ html, body {
   flex-shrink: 0;
 }
 
+.member-status-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-left: 2px;
+  line-height: 1;
+}
+
+.member-row:hover .member-name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Member tooltip on hover */
 .member-tooltip {
   position: fixed;

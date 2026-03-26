@@ -1302,35 +1302,34 @@ const App = (() => {
         : m.name;
       row.appendChild(name);
 
-      // Status emoji inline (no text)
-      if (m.statusEmoji) {
-        const emoji = document.createElement('span');
-        emoji.className = 'member-emoji';
-        emoji.textContent = m.statusEmoji;
-        row.appendChild(emoji);
-      }
-
-      // Profile icon — show if this member has a saved profile icon
+      // Status icon — visible to everyone after their name.
+      // For the current user, pull from localStorage profile; for others, from Supabase status fields.
       const currentUser = DataLayer.getUser();
-      if (currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+      const isCurrentUser = currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim();
+      let displayIcon = m.statusEmoji || '';
+      if (isCurrentUser) {
         const profile = DataLayer.getUserProfile();
-        if (profile.statusIcon) {
-          const profIcon = document.createElement('span');
-          profIcon.className = 'member-profile-icon';
-          profIcon.textContent = profile.statusIcon;
-          if (profile.tooltipText) profIcon.title = profile.tooltipText;
-          row.appendChild(profIcon);
-        }
+        displayIcon = profile.statusIcon || m.statusEmoji || '';
+      }
+      if (displayIcon) {
+        const iconEl = document.createElement('span');
+        iconEl.className = 'member-status-icon';
+        iconEl.textContent = displayIcon;
+        row.appendChild(iconEl);
       }
 
-      // Hover tooltip with title & status
-      row.addEventListener('mouseenter', (e) => {
-        showMemberTooltip(e.clientX, e.clientY, m);
-      });
-      row.addEventListener('mousemove', (e) => {
-        moveMemberTooltip(e.clientX, e.clientY);
-      });
+      // Hover tooltip
+      row.addEventListener('mouseenter', (e) => showMemberTooltip(e.clientX, e.clientY, m));
+      row.addEventListener('mousemove',  (e) => moveMemberTooltip(e.clientX, e.clientY));
       row.addEventListener('mouseleave', hideMemberTooltip);
+
+      // Click → open Slack DM (slack:// deep-link launches desktop app)
+      if (m.slackId) {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', () => {
+          window.open('slack://user?team=T02Q7DX34&id=' + m.slackId, '_blank');
+        });
+      }
 
       return row;
   }
@@ -1364,22 +1363,20 @@ const App = (() => {
       tip.appendChild(titleDiv);
     }
 
-    // Show user's custom profile tooltip if this is the matching user
+    // Status: for current user use localStorage profile; for others use Supabase fields
     const currentUser = DataLayer.getUser();
-    if (currentUser && member.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+    const isMe = currentUser && member.name.toLowerCase().trim() === currentUser.toLowerCase().trim();
+    let tipIcon = member.statusEmoji || '';
+    let tipText = member.statusMessage || '';
+    if (isMe) {
       const profile = DataLayer.getUserProfile();
-      if (profile.statusIcon || profile.tooltipText) {
-        const profDiv = document.createElement('div');
-        profDiv.style.cssText = 'font-size:11px;color:#93C5FD;margin-top:2px;';
-        profDiv.textContent = (profile.statusIcon ? profile.statusIcon + ' ' : '') + (profile.tooltipText || '');
-        tip.appendChild(profDiv);
-      }
+      tipIcon = profile.statusIcon || member.statusEmoji || '';
+      tipText = profile.tooltipText || member.statusMessage || '';
     }
-
-    if (member.statusEmoji || member.statusMessage) {
+    if (tipIcon || tipText) {
       const statusDiv = document.createElement('div');
       statusDiv.className = 'member-tooltip__status';
-      statusDiv.textContent = (member.statusEmoji || '') + ' ' + (member.statusMessage || '');
+      statusDiv.textContent = (tipIcon ? tipIcon + ' ' : '') + tipText;
       tip.appendChild(statusDiv);
     }
 
