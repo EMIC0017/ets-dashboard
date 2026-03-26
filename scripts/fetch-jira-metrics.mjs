@@ -122,12 +122,15 @@ const PODS = [
 
 const AUTH = Buffer.from(`${JIRA_EMAIL}:${JIRA_TOKEN}`).toString('base64');
 
-async function jiraSearch(jql, fields = 'summary,status,priority,created,resolutiondate', maxResults = 500) {
-  const url = `${JIRA_BASE}/rest/api/3/search`;
-  let startAt = 0;
+async function jiraSearch(jql, fields = 'summary,status,priority,created,resolutiondate', maxResults = 100) {
+  const url = `${JIRA_BASE}/rest/api/3/search/jql`;
+  let nextPageToken;
   let all = [];
 
   while (true) {
+    const body = { jql, fields: fields.split(','), maxResults };
+    if (nextPageToken) body.nextPageToken = nextPageToken;
+
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -135,7 +138,7 @@ async function jiraSearch(jql, fields = 'summary,status,priority,created,resolut
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({ jql, fields: fields.split(','), maxResults, startAt }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
@@ -145,8 +148,8 @@ async function jiraSearch(jql, fields = 'summary,status,priority,created,resolut
 
     const data = await res.json();
     all = all.concat(data.issues || []);
-    if (all.length >= data.total || (data.issues || []).length === 0) break;
-    startAt += data.issues.length;
+    if (!data.nextPageToken || (data.issues || []).length === 0) break;
+    nextPageToken = data.nextPageToken;
   }
 
   return all;
