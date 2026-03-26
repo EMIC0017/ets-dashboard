@@ -382,33 +382,59 @@ const DataLayer = (() => {
     return apps;
   }
 
-  // ── Stickers (global) ────────────────────────────────────────────────────
+  // ── Stickers (global + pod-scoped) ──────────────────────────────────────
 
-  let _stickerScope = null; // null = global, podId = pod-scoped
+  let _stickerScope = null; // null = global, podId string = pod-scoped
 
   function setStickerScope(podId) { _stickerScope = podId || null; }
 
-  function loadStickers() {
-    // Pod stickers still use localStorage (pod.html doesn't go through Supabase load)
-    if (_stickerScope) {
-      try {
-        const stored = localStorage.getItem('ets_pod_stickers_' + _stickerScope);
-        if (stored) {
-          const stickers = JSON.parse(stored);
-          const now = Date.now();
-          return stickers.filter(s => s.persistent || !s.expiresAt || new Date(s.expiresAt).getTime() > now);
-        }
-      } catch (e) {}
+  // Maps a Supabase sticker row to the in-memory shape used by stickers.js
+  function _mapStickerRow(s) {
+    return {
+      id:          s.id,
+      icon:        s.content,        // DB column is 'content'; stickers.js uses 'icon'
+      tooltipText: s.tooltip_text || '',
+      x:           parseFloat(s.x),
+      y:           parseFloat(s.y),
+      color:       s.color,
+      placedBy:    s.author,
+      persistent:  s.persistent,
+      expiresAt:   s.expires_at,
+    };
+  }
+
+  // Fetch pod-scoped stickers from Supabase and cache them.
+  // Called by pod.html after DataLayer.load(), and on the 30s refresh interval.
+  async function loadScopedStickers(podId) {
+    if (!podId) return [];
+    try {
+      const { data, error } = await sb.from('stickers').select('*').eq('pod_id', podId);
+      if (error) { console.warn('[DataLayer] pod stickers load error:', error.message); return []; }
+      if (!_config) _config = {};
+      if (!_config._podStickers) _config._podStickers = {};
+      _config._podStickers[podId] = (data || []).map(_mapStickerRow);
+      return _config._podStickers[podId];
+    } catch (e) {
       return [];
     }
-    // Global stickers come from _config (loaded from Supabase)
+  }
+
+  function loadStickers() {
     const now = Date.now();
-    return (_config?.stickers || []).filter(s => s.persistent || !s.expiresAt || new Date(s.expiresAt).getTime() > now);
+    const filter = arr => (arr || []).filter(
+      s => s.persistent || !s.expiresAt || new Date(s.expiresAt).getTime() > now
+    );
+    if (_stickerScope) {
+      return filter(_config?._podStickers?.[_stickerScope]);
+    }
+    return filter(_config?.stickers);
   }
 
   function saveStickers(stickers) {
     if (_stickerScope) {
-      try { localStorage.setItem('ets_pod_stickers_' + _stickerScope, JSON.stringify(stickers)); } catch(e) {}
+      if (!_config) _config = {};
+      if (!_config._podStickers) _config._podStickers = {};
+      _config._podStickers[_stickerScope] = stickers;
     } else {
       if (_config) _config.stickers = stickers;
     }
@@ -418,23 +444,21 @@ const DataLayer = (() => {
     const stickers = loadStickers();
     stickers.push(sticker);
     saveStickers(stickers);
-    if (!_stickerScope) {
-      _sb(sb.from('stickers').insert({
-        id: sticker.id, content: sticker.icon || sticker.content,
-        x: sticker.x, y: sticker.y, color: sticker.color,
-        author: sticker.author, persistent: sticker.persistent || false,
-        expires_at: sticker.expiresAt || null, pod_id: null,
-      }));
-    }
+    // Write to Supabase for both global (pod_id=null) and pod-scoped stickers
+    _sb(sb.from('stickers').insert({
+      id: sticker.id, content: sticker.icon || sticker.content,
+      x: sticker.x, y: sticker.y, color: sticker.color,
+      author: sticker.author, persistent: sticker.persistent || false,
+      expires_at: sticker.expiresAt || null,
+      pod_id: _stickerScope || null,
+    }));
     return stickers;
   }
 
   function removeSticker(id) {
     const stickers = loadStickers().filter(s => s.id !== id);
     saveStickers(stickers);
-    if (!_stickerScope) {
-      _sb(sb.from('stickers').delete().eq('id', id));
-    }
+    _sb(sb.from('stickers').delete().eq('id', id));
     return stickers;
   }
 
@@ -445,12 +469,10 @@ const DataLayer = (() => {
     const s = stickers.find(s => s.id === id);
     if (s) { s.x = x; s.y = y; }
     saveStickers(stickers);
-    if (!_stickerScope) {
-      clearTimeout(_posDebounce[id]);
-      _posDebounce[id] = setTimeout(() => {
-        _sb(sb.from('stickers').update({ x, y }).eq('id', id));
-      }, 1000);
-    }
+    clearTimeout(_posDebounce[id]);
+    _posDebounce[id] = setTimeout(() => {
+      _sb(sb.from('stickers').update({ x, y }).eq('id', id));
+    }, 1000);
     return stickers;
   }
 
@@ -462,15 +484,15 @@ const DataLayer = (() => {
       s.expiresAt  = s.persistent ? null : new Date(Date.now() + 24*60*60*1000).toISOString();
     }
     saveStickers(stickers);
-    if (!_stickerScope && s) {
-      _sb(sb.from('stickers').update({ persistent: s.persistent, expires_at: s.expiresAt }).eq('id', id));
-    }
+    if (s) _sb(sb.from('stickers').update({ persistent: s.persistent, expires_at: s.expiresAt }).eq('id', id));
     return stickers;
   }
 
   function clearAllStickers() {
     saveStickers([]);
-    if (!_stickerScope) {
+    if (_stickerScope) {
+      _sb(sb.from('stickers').delete().eq('pod_id', _stickerScope));
+    } else {
       _sb(sb.from('stickers').delete().is('pod_id', null));
     }
     return [];
@@ -646,7 +668,7 @@ const DataLayer = (() => {
     getAdmins, getSettings,
     saveCertifiedApps, addCertifiedApp, removeCertifiedApp, updateCertifiedApp,
     getTeamRoster, saveTeamRoster, addTeamMember, removeTeamMember, updateTeamMember,
-    loadStickers, saveStickers, addSticker, removeSticker,
+    loadStickers, saveStickers, loadScopedStickers, addSticker, removeSticker,
     updateStickerPosition, toggleStickerPersistent, clearAllStickers,
     setStickerScope,
     getPodBulletin, savePodBulletin, addPodBulletinItem, removePodBulletinItem,

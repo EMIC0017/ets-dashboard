@@ -787,9 +787,16 @@
       document.getElementById('statThroughput').textContent = lastThroughput;
       document.getElementById('statAHT').textContent = lastAHT + (typeof lastAHT === 'number' ? 'm' : '');
 
-      // ── Stickers (pod-scoped) ──
-      DataLayer.setStickerScope(pod.shortName);
+      // ── Stickers (pod-scoped, Supabase-backed) ──
+      DataLayer.setStickerScope(pod.id);
+      await DataLayer.loadScopedStickers(pod.id);
       Stickers.init();
+
+      // Refresh pod stickers every 30s so teammates' stickers appear automatically
+      setInterval(async () => {
+        await DataLayer.loadScopedStickers(pod.id);
+        Stickers.renderStickers();
+      }, 30000);
 
       // ── Profile Button ──
       (function initPodProfileButton() {
@@ -1213,32 +1220,38 @@
           name.title = m.name; // full name on hover
           el.appendChild(name);
 
-          if (m.statusEmoji) {
-            const emoji = document.createElement('span');
-            emoji.className = 'pod-team-member__emoji';
-            emoji.textContent = m.statusEmoji;
-            el.appendChild(emoji);
-          }
-
-          // Profile icon for current user
+          // Status icon visible for all members; current user uses localStorage profile
           const currentUser = DataLayer.getUser();
-          if (currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim()) {
+          const isMe = currentUser && m.name.toLowerCase().trim() === currentUser.toLowerCase().trim();
+          let displayIcon = m.statusEmoji || '';
+          let displayText = m.statusMessage || '';
+          if (isMe) {
             const profile = DataLayer.getUserProfile();
-            if (profile.statusIcon) {
-              const profIcon = document.createElement('span');
-              profIcon.className = 'member-profile-icon';
-              profIcon.style.cssText = 'font-size:11px;flex-shrink:0;cursor:default;';
-              profIcon.textContent = profile.statusIcon;
-              if (profile.tooltipText) profIcon.title = profile.tooltipText;
-              el.appendChild(profIcon);
-            }
+            displayIcon = profile.statusIcon || m.statusEmoji || '';
+            displayText = profile.tooltipText || m.statusMessage || '';
           }
-
-          if (m.statusMessage) {
+          if (displayIcon) {
+            const iconEl = document.createElement('span');
+            iconEl.className = 'member-status-icon';
+            iconEl.textContent = displayIcon;
+            el.appendChild(iconEl);
+          }
+          if (displayText) {
             const tip = document.createElement('div');
             tip.className = 'pod-team-member__status-tip';
-            tip.textContent = m.statusMessage;
+            tip.textContent = displayText;
             el.appendChild(tip);
+          }
+
+          // Full name + status in title tooltip
+          name.title = m.name + (displayText ? ' — ' + displayText : '');
+
+          // Click → Slack DM
+          if (m.slackId) {
+            el.style.cursor = 'pointer';
+            el.addEventListener('click', () => {
+              window.open('slack://user?team=T02Q7DX34&id=' + m.slackId, '_blank');
+            });
           }
 
           grid.appendChild(el);
