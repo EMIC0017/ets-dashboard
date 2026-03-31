@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:21:41.271Z",
+  "generatedAt": "2026-03-31T15:57:46.076Z",
   "pods": {
     "ads": {
       "weeklyIncoming": [
@@ -47,7 +47,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:41.671Z"
+      "fetchedAt": "2026-03-31T15:57:46.550Z"
     },
     "caper": {
       "weeklyIncoming": [
@@ -58,7 +58,7 @@
         255,
         273,
         217,
-        48
+        51
       ],
       "weeklyThroughput": [
         65,
@@ -68,7 +68,7 @@
         228,
         264,
         235,
-        61
+        62
       ],
       "weeklyAHT": [
         17.8,
@@ -78,13 +78,13 @@
         54.6,
         66.5,
         77.2,
-        93.9
+        92.6
       ],
       "responseSLA": null,
       "resolutionSLA": 69,
       "totalBreaches": 91,
       "totalEscalations": 93,
-      "openCount": 121,
+      "openCount": 123,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -95,7 +95,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:46.197Z"
+      "fetchedAt": "2026-03-31T15:57:51.653Z"
     },
     "cat": {
       "weeklyIncoming": [
@@ -106,7 +106,7 @@
         31,
         17,
         26,
-        7
+        8
       ],
       "weeklyThroughput": [
         8,
@@ -132,7 +132,7 @@
       "resolutionSLA": 41,
       "totalBreaches": 24,
       "totalEscalations": 24,
-      "openCount": 29,
+      "openCount": 30,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -143,7 +143,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:46.784Z"
+      "fetchedAt": "2026-03-31T15:57:52.256Z"
     },
     "faas": {
       "weeklyIncoming": [
@@ -164,7 +164,7 @@
         24,
         32,
         26,
-        8
+        10
       ],
       "weeklyAHT": [
         26.4,
@@ -174,13 +174,13 @@
         242.3,
         246.7,
         395.9,
-        736.7
+        639.1
       ],
       "responseSLA": null,
       "resolutionSLA": 32,
-      "totalBreaches": 72,
-      "totalEscalations": 73,
-      "openCount": 75,
+      "totalBreaches": 71,
+      "totalEscalations": 72,
+      "openCount": 73,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -191,7 +191,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:47.528Z"
+      "fetchedAt": "2026-03-31T15:57:53.249Z"
     },
     "fs": {
       "weeklyIncoming": [
@@ -212,7 +212,7 @@
         58,
         42,
         52,
-        11
+        14
       ],
       "weeklyAHT": [
         8.5,
@@ -222,13 +222,13 @@
         110.6,
         84.2,
         129.4,
-        145.8
+        116.9
       ],
       "responseSLA": null,
-      "resolutionSLA": 68,
+      "resolutionSLA": 69,
       "totalBreaches": 77,
       "totalEscalations": 77,
-      "openCount": 90,
+      "openCount": 87,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -239,7 +239,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:48.577Z"
+      "fetchedAt": "2026-03-31T15:57:54.707Z"
     },
     "wl": {
       "weeklyIncoming": [
@@ -287,7 +287,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-03-31T14:21:48.767Z"
+      "fetchedAt": "2026-03-31T15:57:54.936Z"
     }
   }
 }
