@@ -488,6 +488,15 @@ const DataLayer = (() => {
     return stickers;
   }
 
+  function updateStickerTooltip(id, text) {
+    const stickers = loadStickers();
+    const s = stickers.find(s => s.id === id);
+    if (s) s.tooltipText = text;
+    saveStickers(stickers);
+    _sb(sb.from('stickers').update({ tooltip_text: text }).eq('id', id));
+    return stickers;
+  }
+
   function clearAllStickers() {
     saveStickers([]);
     if (_stickerScope) {
@@ -669,7 +678,7 @@ const DataLayer = (() => {
     saveCertifiedApps, addCertifiedApp, removeCertifiedApp, updateCertifiedApp,
     getTeamRoster, saveTeamRoster, addTeamMember, removeTeamMember, updateTeamMember,
     loadStickers, saveStickers, loadScopedStickers, addSticker, removeSticker,
-    updateStickerPosition, toggleStickerPersistent, clearAllStickers,
+    updateStickerPosition, toggleStickerPersistent, updateStickerTooltip, clearAllStickers,
     setStickerScope,
     getPodBulletin, savePodBulletin, addPodBulletinItem, removePodBulletinItem,
     getPodApps, savePodApps, addPodApp, removePodApp,

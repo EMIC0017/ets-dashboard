@@ -229,9 +229,12 @@ const Stickers = (() => {
       // Thought bubble (if text exists)
       const customText = sticker.tooltipText || '';
       if (customText) {
+        // Derive thought bubble position deterministically from sticker ID
+        // so it stays consistent across refreshes without needing a DB column
         if (sticker.thoughtPos === undefined || sticker.thoughtPos === null) {
-          sticker.thoughtPos = Math.floor(Math.random() * 8);
-          _saveStickerField(sticker.id, 'thoughtPos', sticker.thoughtPos);
+          let hash = 0;
+          for (let i = 0; i < sticker.id.length; i++) hash = ((hash << 5) - hash) + sticker.id.charCodeAt(i);
+          sticker.thoughtPos = Math.abs(hash) % 8;
         }
         const thought = document.createElement('div');
         thought.className = 'sticker-bubble__thought sticker-bubble__thought--pos' + sticker.thoughtPos;
@@ -353,12 +356,7 @@ const Stickers = (() => {
         const newText = thoughtInput.value.trim().slice(0, 15);
         if (newText !== (sticker.tooltipText || '')) {
           sticker.tooltipText = newText;
-          const all = DataLayer.loadStickers();
-          const target = all.find(s => s.id === sticker.id);
-          if (target) {
-            target.tooltipText = newText;
-            DataLayer.saveStickers(all);
-          }
+          DataLayer.updateStickerTooltip(sticker.id, newText);
           renderStickers();
         }
       };
