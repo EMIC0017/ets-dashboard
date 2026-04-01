@@ -328,7 +328,7 @@ const DataLayer = (() => {
 
   function getAnnouncements()      { return _config?.announcements || []; }
   function saveAnnouncements(arr)  { if (_config) _config.announcements = arr; }
-  function getBannerColor()        { return _config?.settings?.bannerColor || '#EF4444'; }
+  function getBannerColor()        { try { return localStorage.getItem('ets_banner_color') || _config?.settings?.bannerColor || '#EF4444'; } catch(e) { return _config?.settings?.bannerColor || '#EF4444'; } }
   function saveBannerColor(color)  {
     if (_config?.settings) _config.settings.bannerColor = color;
     try { localStorage.setItem('ets_banner_color', color); } catch(e) {}
