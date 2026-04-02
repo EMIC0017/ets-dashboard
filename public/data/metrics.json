@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-02T22:21:55.150Z",
+  "generatedAt": "2026-04-02T23:23:00.890Z",
   "pods": {
     "ads": {
       "weeklyIncoming": [
@@ -47,7 +47,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:21:55.739Z"
+      "fetchedAt": "2026-04-02T23:23:01.281Z"
     },
     "caper": {
       "weeklyIncoming": [
@@ -58,7 +58,7 @@
         255,
         273,
         220,
-        234
+        240
       ],
       "weeklyThroughput": [
         65,
@@ -68,7 +68,7 @@
         228,
         264,
         234,
-        179
+        184
       ],
       "weeklyAHT": [
         17.8,
@@ -78,13 +78,13 @@
         54.6,
         66.5,
         77.5,
-        76.4
+        74.6
       ],
       "responseSLA": null,
       "resolutionSLA": 70,
-      "totalBreaches": 92,
+      "totalBreaches": 93,
       "totalEscalations": 100,
-      "openCount": 193,
+      "openCount": 194,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -95,7 +95,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:22:03.074Z"
+      "fetchedAt": "2026-04-02T23:23:05.423Z"
     },
     "cat": {
       "weeklyIncoming": [
@@ -143,7 +143,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:22:03.890Z"
+      "fetchedAt": "2026-04-02T23:23:05.946Z"
     },
     "faas": {
       "weeklyIncoming": [
@@ -191,7 +191,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:22:04.778Z"
+      "fetchedAt": "2026-04-02T23:23:06.616Z"
     },
     "fs": {
       "weeklyIncoming": [
@@ -226,8 +226,8 @@
       ],
       "responseSLA": null,
       "resolutionSLA": 67,
-      "totalBreaches": 66,
-      "totalEscalations": 74,
+      "totalBreaches": 67,
+      "totalEscalations": 75,
       "openCount": 84,
       "weeks": [
         "Feb 9",
@@ -239,7 +239,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:22:06.707Z"
+      "fetchedAt": "2026-04-02T23:23:07.599Z"
     },
     "wl": {
       "weeklyIncoming": [
@@ -287,7 +287,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-02T22:22:06.950Z"
+      "fetchedAt": "2026-04-02T23:23:07.753Z"
     }
   }
 }
