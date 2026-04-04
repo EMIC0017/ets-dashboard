@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-04T19:23:01.259Z",
+  "generatedAt": "2026-04-04T20:17:57.241Z",
   "pods": {
     "ads": {
       "weeklyIncoming": [
@@ -47,7 +47,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:01.822Z"
+      "fetchedAt": "2026-04-04T20:17:57.700Z"
     },
     "caper": {
       "weeklyIncoming": [
@@ -58,7 +58,7 @@
         256,
         273,
         219,
-        287
+        290
       ],
       "weeklyThroughput": [
         65,
@@ -68,7 +68,7 @@
         228,
         264,
         234,
-        246
+        248
       ],
       "weeklyAHT": [
         17.8,
@@ -78,13 +78,13 @@
         54.6,
         66.5,
         77.5,
-        78.2
+        77.6
       ],
       "responseSLA": null,
       "resolutionSLA": 71,
-      "totalBreaches": 96,
+      "totalBreaches": 101,
       "totalEscalations": 157,
-      "openCount": 179,
+      "openCount": 180,
       "weeks": [
         "Feb 9",
         "Feb 16",
@@ -95,7 +95,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:06.286Z"
+      "fetchedAt": "2026-04-04T20:18:03.934Z"
     },
     "cat": {
       "weeklyIncoming": [
@@ -143,7 +143,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:06.824Z"
+      "fetchedAt": "2026-04-04T20:18:04.567Z"
     },
     "faas": {
       "weeklyIncoming": [
@@ -179,7 +179,7 @@
       "responseSLA": null,
       "resolutionSLA": 31,
       "totalBreaches": 67,
-      "totalEscalations": 68,
+      "totalEscalations": 69,
       "openCount": 70,
       "weeks": [
         "Feb 9",
@@ -191,7 +191,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:07.536Z"
+      "fetchedAt": "2026-04-04T20:18:05.454Z"
     },
     "fs": {
       "weeklyIncoming": [
@@ -239,7 +239,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:08.535Z"
+      "fetchedAt": "2026-04-04T20:18:06.934Z"
     },
     "wl": {
       "weeklyIncoming": [
@@ -287,7 +287,7 @@
         "Mar 23",
         "Mar 30"
       ],
-      "fetchedAt": "2026-04-04T19:23:08.735Z"
+      "fetchedAt": "2026-04-04T20:18:07.212Z"
     }
   }
 }
