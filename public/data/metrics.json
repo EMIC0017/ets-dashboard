@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-19T18:32:01.651Z",
+  "generatedAt": "2026-04-19T19:33:27.308Z",
   "pods": {
     "ads": {
       "weeklyIncoming": [
@@ -47,7 +47,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:02.252Z"
+      "fetchedAt": "2026-04-19T19:33:27.898Z"
     },
     "caper": {
       "weeklyIncoming": [
@@ -58,7 +58,7 @@
         219,
         343,
         214,
-        208
+        211
       ],
       "weeklyThroughput": [
         81,
@@ -68,7 +68,7 @@
         232,
         279,
         276,
-        210
+        213
       ],
       "weeklyAHT": [
         25.2,
@@ -78,12 +78,12 @@
         75.8,
         64.7,
         107.3,
-        86.8
+        86
       ],
       "responseSLA": null,
       "resolutionSLA": 71,
-      "totalBreaches": 100,
-      "totalEscalations": 114,
+      "totalBreaches": 99,
+      "totalEscalations": 117,
       "openCount": 139,
       "weeks": [
         "Feb 23",
@@ -95,7 +95,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:09.059Z"
+      "fetchedAt": "2026-04-19T19:33:33.754Z"
     },
     "cat": {
       "weeklyIncoming": [
@@ -143,7 +143,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:09.775Z"
+      "fetchedAt": "2026-04-19T19:33:34.387Z"
     },
     "faas": {
       "weeklyIncoming": [
@@ -191,7 +191,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:10.784Z"
+      "fetchedAt": "2026-04-19T19:33:35.215Z"
     },
     "fs": {
       "weeklyIncoming": [
@@ -227,7 +227,7 @@
       "responseSLA": null,
       "resolutionSLA": 66,
       "totalBreaches": 79,
-      "totalEscalations": 83,
+      "totalEscalations": 84,
       "openCount": 84,
       "weeks": [
         "Feb 23",
@@ -239,7 +239,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:12.492Z"
+      "fetchedAt": "2026-04-19T19:33:36.644Z"
     },
     "wl": {
       "weeklyIncoming": [
@@ -287,7 +287,7 @@
         "Apr 6",
         "Apr 13"
       ],
-      "fetchedAt": "2026-04-19T18:32:12.843Z"
+      "fetchedAt": "2026-04-19T19:33:36.868Z"
     }
   }
 }
